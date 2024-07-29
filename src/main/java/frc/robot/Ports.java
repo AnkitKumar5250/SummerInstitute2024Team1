@@ -19,4 +19,10 @@ public final class Ports {
         public static final int elevatorPort = 0;
     }
 
+    public static final class Drive {
+        public static final int leftEncoderSourceA = 0;
+        public static final int leftEncoderSourceB = 0;
+        public static final int RightEncoderSourceA = 0;
+        public static final int RightEncoderSourceB = 0;
+    }
 }

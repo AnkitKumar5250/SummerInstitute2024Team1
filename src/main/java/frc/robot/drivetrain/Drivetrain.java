@@ -1,5 +1,7 @@
 package frc.robot.drivetrain;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -56,7 +58,7 @@ public class Drivetrain extends SubsystemBase {
      * updates voltage based on PID in order to drive a certain distance
      * @return voltage of the motors
      */
-    public double driveDistance(Measure<Distance> meters) {
+    public void driveDistance(Double meters) {
         double voltage = 0;
         double encoderValue = leftEncoder.get() + rightEncoder.get()/2;
         voltage = pidControllerTranslation.calculate(encoderValue, Meters.convertFrom(meters, Meters));
