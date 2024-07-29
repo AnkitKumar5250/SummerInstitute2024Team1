@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // Import all necessary items
 import static frc.robot.intake.IntakeConstants.*;
+import static frc.robot.Ports.Elevator.elevatorPort;
 import static frc.robot.Ports.Intake.*;
 
 public class Intake extends SubsystemBase {
