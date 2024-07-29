@@ -24,6 +24,8 @@ public class Drivetrain extends SubsystemBase {
     private Encoder rightEncoder = new Encoder(RightEncoderSourceA, RightEncoderSourceB);
 
     private final PIDController pidControllerRotation = new PIDController(1, 0, 1);
+    private final PIDController pidControllerTranslation = new PIDController(moveP, moveI, moveD);
+
 
     public Drivetrain() {
         leftFollower.follow(leftLeader);
