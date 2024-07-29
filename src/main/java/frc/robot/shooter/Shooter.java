@@ -3,11 +3,14 @@ package frc.robot.shooter;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Ports.Shooter.*;
 import static frc.robot.shooter.ShooterConstants.*;
+import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.FieldConstants.*;
 
 // The shooter is to be manually tuned once the robot is all set and working.
@@ -23,9 +26,7 @@ import static frc.robot.Constants.FieldConstants.*;
 
 public class Shooter extends SubsystemBase {
     private final CANSparkMax motor = new CANSparkMax(motorPort, MotorType.kBrushless);
-    private final RelativeEncoder encoder = motor.getEncoder(); // CHARLIE WHY DID YOU USE AN ABSOLUTE ENCODER YOU
-                                                                // ABSOLUTE BUFFOON OF A MAN - michaela x. ??????
-                                                                // (wasn't meant in all caps)
+    private final RelativeEncoder encoder = motor.getEncoder();
     private final PIDController pid = new PIDController(kP, kI, kD);
 
     /**
@@ -38,12 +39,18 @@ public class Shooter extends SubsystemBase {
      * @return the amount of power neccesary to score the cell into the bank
      */
     public double calcVelocity(double x, double y) {
-        double velocity = Math.sqrt((G * Math.pow(x,2) * Math.pow(1/Math.cos(LAUNCH_ANGLE),2))/(2*(Math.tan(LAUNCH_ANGLE)*x-y)));
+        x = Math.abs(x - TARGET_X.in(Inches));
+        y = Math.abs(y - TARGET_Y.in(Inches));
+
+        double hDistance = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        double vDistance = TARGET_Z.in(Inches) - SHOOTER_HEIGHT;
+
+        double velocity = Math.sqrt((G * Math.pow(hDistance,2) * Math.pow(1/Math.cos(LAUNCH_ANGLE),2))/(2*(Math.tan(LAUNCH_ANGLE)*hDistance-vDistance)));
         return velocity;
     }
 
     /**
-     * condtruocotr
+     * constructor
      */
     public Shooter() {
 

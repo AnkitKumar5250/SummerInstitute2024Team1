@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -65,6 +64,12 @@ public final class Constants {
     public static final Measure<Distance> END_ZONE_LENGTH = Inches.of(155);
     public static final Measure<Distance> END_ZONE_WIDTH = Inches.of(180);
 
-    public static final double G = 9.8; // meters per second^2
+    public static final double G = 9.81; // meters per second^2
+
+    public static final Measure<Distance> TARGET_X = Inches.of(0);
+    public static final Measure<Distance> TARGET_Y = Inches.of(0);
+    public static final Measure<Distance> TARGET_Z = Inches.of(0);
+
+    public static final Measure<Distance> BALL_RADIUS = Inches.of(0);
   }
 }
