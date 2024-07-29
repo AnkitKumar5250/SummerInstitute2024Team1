@@ -21,4 +21,8 @@ public final class Ports {
         public static final int RightEncoderSourceA = 0;
         public static final int RightEncoderSourceB = 0;
     }
+    public static class OperatorConstants {
+        public static final int driverControllerPort = 0;
+        public static final int OperatorControllerPort = 0;
+      }
 }
