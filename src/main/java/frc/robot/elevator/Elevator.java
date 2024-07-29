@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Ports.Elevator.*;
+import static frc.robot.Ports.Intake.beamBreakEntrancePort;
+import static frc.robot.Ports.Intake.pivotPort;
+import static frc.robot.Ports.Intake.rollerPort;
 
 public class Elevator extends SubsystemBase {
     boolean extended = false;
