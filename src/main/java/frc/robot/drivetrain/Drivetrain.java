@@ -11,8 +11,6 @@ import static frc.robot.Constants.FieldConstants.BANK_X;
 import static frc.robot.drivetrain.DrivetrainConstants.*;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.Encoder;
 
 
@@ -58,14 +56,15 @@ public class Drivetrain extends SubsystemBase {
      * updates voltage based on PID in order to drive a certain distance
      * @return voltage of the motors
      */
-    public void driveDistance(Double meters) {
+    public void driveDistance(double meters) {
         double voltage = 0;
         double encoderValue = leftEncoder.get() + rightEncoder.get()/2;
         voltage = pidControllerTranslation.calculate(encoderValue, Meters.convertFrom(meters, Meters));
-        // code to calculate voltage that needs to be applied-
-        // in order to move a certain distance
-        // hint: use PID
         drive(Math.sqrt(voltage), Math.sqrt(voltage));
+    }
+
+    public Command driveDistanceCommand(double meters){
+        return Commands.run(() -> driveDistance(meters));
     }
 
 

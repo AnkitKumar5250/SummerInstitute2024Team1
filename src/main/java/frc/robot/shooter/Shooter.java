@@ -46,6 +46,7 @@ public class Shooter extends SubsystemBase {
         double vDistance = TARGET_Z.in(Inches) - SHOOTER_HEIGHT;
 
         double velocity = Math.sqrt((G * Math.pow(hDistance,2) * Math.pow(1/Math.cos(LAUNCH_ANGLE),2))/(2*(Math.tan(LAUNCH_ANGLE)*hDistance-vDistance)));
+        velocity *= POWER_COEFFICIENT;
         return velocity;
     }
 
@@ -74,7 +75,6 @@ public class Shooter extends SubsystemBase {
 
     /**
      * sets the speed of the motor using PID
-     * 
      * @param velocity the target speed of the motor
      */
     public Command setVelocity(double velocity) {
