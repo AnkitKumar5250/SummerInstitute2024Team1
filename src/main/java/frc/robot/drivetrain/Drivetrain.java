@@ -84,8 +84,8 @@ public class Drivetrain extends SubsystemBase {
         double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
         voltage = pidControllerTranslation.calculate(encoderValue, meters);
 
-        if (voltage > 1) {
-            voltage = 1;
+        if (Math.abs(voltage) > 1) {
+            voltage = Math.copySign(1, voltage);
         }
 
         leftLeader.set(voltage);
@@ -105,8 +105,8 @@ public class Drivetrain extends SubsystemBase {
         double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
         double voltage = pidControllerRotation.calculate(encoderValue / 2, distance);
 
-        if (voltage > 1) {
-            voltage = 1;
+        if (Math.abs(voltage) > 1) {
+            voltage = Math.copySign(1, voltage);
         }
 
         leftLeader.setVoltage(-voltage);
@@ -122,7 +122,7 @@ public class Drivetrain extends SubsystemBase {
      * @param y : y position of robot
      */
     public double rotateDegrees(double x, double y) {
-        double distance = (FieldConstants.BANK_X.in(Meters) - x / 156 - y) * TURNING_RADIUS * 2 * Math.PI / 360;
+        double distance = calcAngle(x, y) * TURNING_RADIUS * 2 * Math.PI / 360;
 
         double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
         double voltage = pidControllerRotation.calculate(encoderValue / 2, distance);
