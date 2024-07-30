@@ -30,8 +30,10 @@ public class Robot extends TimedRobot {
   private static final Elevator elevator = new Elevator();
   private static final Shooter shooter = new Shooter();
   private static final Drivetrain drivetrain = new Drivetrain();
-  private static final CommandXboxController controller = new CommandXboxController(
-      Constants.OperatorConstants.DRIVE_CONTROLLER_PORT);
+  private static final CommandXboxController driver = new CommandXboxController(
+      Ports.OperatorConstants.driverControllerPort);
+  private static final CommandXboxController operator = new CommandXboxController(Ports.OperatorConstants.OperatorControllerPort);
+
 
   private static Pose2d position = new Pose2d(0, 0, new Rotation2d());
 
@@ -83,14 +85,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    controller.a().whileTrue(
+    operator.a().whileTrue(
         Commands.sequence(
             intake.extend()
                 .alongWith(intake.runIntake())
                 .alongWith(elevator.elevatorBrake()))
             .finallyDo(() -> intake.retract()));
 
-    controller.b().onTrue(shooter.turnOff());
+    operator.b().onTrue(shooter.turnOff());
   }
 
   /** This function is called periodically during operator control. */
@@ -98,10 +100,11 @@ public class Robot extends TimedRobot {
   // elevator until the beambreak is triggered
   @Override
   public void teleopPeriodic() {
-    drivetrain.drive(controller.getLeftY(), controller.getRightY());
+    //drivetrain.drive(controller.getLeftY(), controller.getRightY());
+    drivetrain.arcadeDrive(driver.getLeftY(), driver.getRightX());
 
     if (elevator.getBeamBreak()) {
-      CommandScheduler.getInstance().schedule(new ShootCommand(drivetrain, shooter, position).until(controller.x()));
+      CommandScheduler.getInstance().schedule(new ShootCommand(drivetrain, shooter, position).until(operator.x()));
     }
   }
 
