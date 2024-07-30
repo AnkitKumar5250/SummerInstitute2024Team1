@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.Constants.FieldConstants.BANK_X;
 import static frc.robot.shooter.ShooterConstants.voltageCommandEndThreshold;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -42,7 +44,7 @@ public class ShootCommand extends Command {
     @Override
     public void execute() {
         shooter.updateVelocity(position.getX(), position.getY());
-        drivetrain.updateDirection(position.getX(),position.getY());
+        drivetrain.updateDirection(Math.atan(BANK_X.in(Meters) - position.getX() / 156 - position.getY()));
     }
 
     // Called once the command ends or is interrupted.

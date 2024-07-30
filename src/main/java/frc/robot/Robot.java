@@ -100,7 +100,6 @@ public class Robot extends TimedRobot {
   // elevator until the beambreak is triggered
   @Override
   public void teleopPeriodic() {
-    //drivetrain.drive(controller.getLeftY(), controller.getRightY());
     drivetrain.arcadeDrive(driver.getLeftY(), driver.getRightX());
 
     if (elevator.getBeamBreak()) {
