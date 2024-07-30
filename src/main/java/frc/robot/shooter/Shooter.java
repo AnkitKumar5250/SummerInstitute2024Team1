@@ -4,10 +4,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Suppliers.MinVoltSupplier;
+
 import static frc.robot.Ports.Shooter.*;
 import static frc.robot.shooter.ShooterConstants.*;
 import static edu.wpi.first.units.Units.Inches;
@@ -33,9 +34,9 @@ public class Shooter extends SubsystemBase {
      * calculates the amount of power neccesary to score the cell into the bank
      * 
      * @param x the current X position of the robot on the field (requires
-     *                 drivetrain input)
+     *          drivetrain input)
      * @param y the current Y position of the robot on the field (requires
-     *                 drivetrain input)
+     *          drivetrain input)
      * @return the amount of power neccesary to score the cell into the bank
      */
     public double calcVelocity(double x, double y) {
@@ -45,7 +46,8 @@ public class Shooter extends SubsystemBase {
         double hDistance = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
         double vDistance = TARGET_Z.in(Inches) - SHOOTER_HEIGHT;
 
-        double velocity = Math.sqrt((G * Math.pow(hDistance,2) * Math.pow(1/Math.cos(LAUNCH_ANGLE),2))/(2*(Math.tan(LAUNCH_ANGLE)*hDistance-vDistance)));
+        double velocity = Math.sqrt((G * Math.pow(hDistance, 2) * Math.pow(1 / Math.cos(LAUNCH_ANGLE), 2))
+                / (2 * (Math.tan(LAUNCH_ANGLE) * hDistance - vDistance)));
         velocity *= POWER_COEFFICIENT;
         return velocity;
     }
@@ -75,10 +77,21 @@ public class Shooter extends SubsystemBase {
 
     /**
      * sets the speed of the motor using PID
+     * 
      * @param velocity the target speed of the motor
      */
     public Command setVelocity(double velocity) {
-        return run(() -> motor.setVoltage(pid.calculate(getVelocity(), velocity)));
+        return run(() -> motor.setVoltage(pid.calculate(getVelocity(), velocity)))
+                .until(new MinVoltSupplier(motor.getBusVoltage()));
+    }
+
+    /**
+     * sets the speed of the motor using PID
+     * 
+     * @param velocity the target speed of the motor
+     */
+    public Command setVelocity(double x, double y) {
+        return run(() -> updateVelocity(x, y)).until(new MinVoltSupplier(motor.getBusVoltage()));
     }
 
     /**

@@ -6,15 +6,20 @@ package frc.robot;
 
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 
 import static edu.wpi.first.units.Units.*;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
+ * The Constants class provides a convenient place for teams to hold robot-wide
+ * numerical or boolean
+ * constants. This class should not be used for any other purpose. All constants
+ * should be declared
  * globally (i.e. public static). Do not put anything functional in this class.
  *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
+ * <p>
+ * It is advised to statically import this class (or one of its inner classes)
+ * wherever the
  * constants are needed, to reduce verbosity.
  */
 
@@ -22,7 +27,7 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int DRIVE_CONTROLLER_PORT = 0;
   }
-  
+
   public static class FieldConstants {
     // 0,0 is at the center
 
@@ -44,7 +49,7 @@ public final class Constants {
     public static final Measure<Distance> FIELD_LENGTH = Inches.of(312);
     public static final Measure<Distance> FIELD_WIDTH = Inches.of(180);
 
-    //dimensions of field
+    // dimensions of field
 
     public static final Measure<Distance> FIELD_X = Inches.of(0);
     public static final Measure<Distance> FIELD_Y = Inches.of(0);
@@ -71,5 +76,7 @@ public final class Constants {
     public static final Measure<Distance> TARGET_Z = Inches.of(0);
 
     public static final Measure<Distance> BALL_RADIUS = Inches.of(0);
+
+    public static final Measure<Voltage> MINIMUM_VOLTAGE_THRESHHOLD = Volts.of(0.1);
   }
 }

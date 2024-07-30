@@ -8,9 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.ShootCommand;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.elevator.Elevator;
 import frc.robot.intake.Intake;
@@ -32,8 +30,8 @@ public class Robot extends TimedRobot {
   private static final Drivetrain drivetrain = new Drivetrain();
   private static final CommandXboxController driver = new CommandXboxController(
       Ports.OperatorConstants.driverControllerPort);
-  private static final CommandXboxController operator = new CommandXboxController(Ports.OperatorConstants.OperatorControllerPort);
-
+  private static final CommandXboxController operator = new CommandXboxController(
+      Ports.OperatorConstants.OperatorControllerPort);
 
   private static Pose2d position = new Pose2d(0, 0, new Rotation2d());
 
@@ -72,24 +70,29 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters autonomous mode. */
   @Override
   public void autonomousInit() {
-
+    
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
     if (elevator.getBeamBreak()) {
-      CommandScheduler.getInstance().schedule(new ShootCommand(drivetrain, shooter, position));
+      CommandScheduler.getInstance().schedule(
+          drivetrain
+              .rotateDegreesCommand(position.getX(),position.getY())
+              .alongWith(shooter.setVelocity(position.getX(), position.getY())));
     }
   }
 
   @Override
   public void teleopInit() {
+    CommandScheduler.getInstance().cancelAll();
+    CommandScheduler.getInstance().schedule(drivetrain.driveCommand(driver.getLeftY(), driver.getRightY()));
+
     operator.a().whileTrue(
-        Commands.sequence(
-            intake.extend()
-                .alongWith(intake.runIntake())
-                .alongWith(elevator.elevatorBrake()))
+        intake.extend()
+            .alongWith(intake.runIntake())
+            .alongWith(elevator.elevatorBrake())
             .finallyDo(() -> intake.retract()));
 
     operator.b().onTrue(shooter.turnOff());
@@ -103,7 +106,10 @@ public class Robot extends TimedRobot {
     drivetrain.arcadeDrive(driver.getLeftY(), driver.getRightX());
 
     if (elevator.getBeamBreak()) {
-      CommandScheduler.getInstance().schedule(new ShootCommand(drivetrain, shooter, position).until(operator.x()));
+      CommandScheduler.getInstance().schedule(
+          drivetrain
+              .rotateDegreesCommand(position.getX(),position.getY())
+              .alongWith(shooter.setVelocity(position.getX(), position.getY())));
     }
   }
 

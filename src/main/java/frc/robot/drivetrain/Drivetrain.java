@@ -8,18 +8,12 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.FieldConstants.BANK_X;
-import static frc.robot.drivetrain.DrivetrainConstants.RightEncoderSourceA;
-import static frc.robot.drivetrain.DrivetrainConstants.RightEncoderSourceB;
-import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
-import static frc.robot.drivetrain.DrivetrainConstants.leftEncoderSourceA;
-import static frc.robot.drivetrain.DrivetrainConstants.leftEncoderSourceB;
-import static frc.robot.drivetrain.DrivetrainConstants.moveD;
-import static frc.robot.drivetrain.DrivetrainConstants.moveI;
-import static frc.robot.drivetrain.DrivetrainConstants.moveP;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.Suppliers.MinVoltSupplier;
+
+import static frc.robot.drivetrain.DrivetrainConstants.*;
 
 public class Drivetrain extends SubsystemBase {
     // instantiates motors
@@ -65,9 +59,82 @@ public class Drivetrain extends SubsystemBase {
         DiffDrive.arcadeDrive(ySpeed, zSpeed, true);
     }
 
-    public void drive(double leftSpeed, double rightSpeed) {
-        leftLeader.set(Math.copySign(Math.pow(leftSpeed, 2), leftSpeed));
-        rightLeader.set(Math.copySign(Math.pow(rightSpeed, 2), -rightSpeed));
+    /**
+     * Drives based on driver input.
+     * 
+     * @param leftSpeed  Y-axis of left joystick.
+     * @param rightSpeed X-axis of right joystick.
+     * @return A command for driving based on driver input.
+     */
+    public void tankdrive(double leftSpeed, double rightSpeed) {
+        DiffDrive.tankDrive(leftSpeed, -rightSpeed);
+    }
+
+    public double calcAngle(double x, double y) {
+        return FieldConstants.BANK_X.in(Meters) - x / 156 - y;
+    }
+
+    /**
+     * updates voltage based on PID in order to drive a certain distance.
+     * 
+     * @return voltage of the motors.
+     */
+    public double driveDistance(double meters) {
+        double voltage = 0;
+        double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
+        voltage = pidControllerTranslation.calculate(encoderValue, meters);
+
+        if (voltage > 1) {
+            voltage = 1;
+        }
+
+        leftLeader.set(voltage);
+        rightLeader.set(voltage);
+
+        return voltage;
+    }
+
+    /**
+     * updates voltage based on PID in order to fufill rotation command.
+     * 
+     * @param degrees : degrees to rotate
+     */
+    public double rotateDegrees(double degrees) {
+        double distance = degrees * TURNING_RADIUS * 2 * Math.PI / 360;
+
+        double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
+        double voltage = pidControllerRotation.calculate(encoderValue / 2, distance);
+
+        if (voltage > 1) {
+            voltage = 1;
+        }
+
+        leftLeader.setVoltage(-voltage);
+        rightLeader.setVoltage(voltage);
+
+        return voltage;
+    }
+
+     /**
+     * updates voltage based on PID in order to fufill rotation command.
+     * 
+     * @param x : x position of robot
+     * @param y : y position of robot
+     */
+    public double rotateDegrees(double x, double y) {
+        double distance = (FieldConstants.BANK_X.in(Meters) - x / 156 - y) * TURNING_RADIUS * 2 * Math.PI / 360;
+
+        double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
+        double voltage = pidControllerRotation.calculate(encoderValue / 2, distance);
+        
+        if (Math.abs(voltage) > 1) {
+            voltage = Math.copySign(1, voltage);
+        }
+
+        leftLeader.setVoltage(-voltage);
+        rightLeader.setVoltage(voltage);
+
+        return voltage;
     }
 
     /**
@@ -82,43 +149,33 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * updates voltage based on PID in order to drive a certain distance.
-     * 
-     * @return voltage of the motors.
-     */
-    public double driveDistance(double meters) {
-        double voltage = 0;
-        double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
-        voltage = pidControllerTranslation.calculate(encoderValue, meters);
-        drive(Math.sqrt(voltage), Math.sqrt(voltage));
-        return voltage;
-    }
-
-    /**
      * Drives a certain distance.
-     * 
+     *
      * @param meters : distance to drive.
      * @return A command that drives a certain distance.
      */
     public Command driveDistanceCommand(double meters) {
-        return Commands.run(() -> driveDistance(meters));
+        return Commands.run(() -> driveDistance(meters)).until(new MinVoltSupplier(leftLeader.getBusVoltage()));
     }
 
     /**
-     * updates voltage based on PID in order to fufill rotation command.
-     * 
-     * @param x : x position of robot
-     * @param y : y position of robot
+     * Drives a certain distance.
+     *
+     * @param meters : distance to drive.
+     * @return A command that drives a certain distance.
      */
-    public double updateDirection(double degrees) {
-        double distance = degrees * TURNING_RADIUS * 2 * Math.PI / 360;
-
-        double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
-        double voltage = pidControllerRotation.calculate(encoderValue / 2, distance);
-
-        leftLeader.setVoltage(-voltage);
-        rightLeader.setVoltage(voltage);
-
-        return voltage;
+    public Command rotateDegreesCommand(double degrees) {
+        return Commands.run(() -> rotateDegrees(degrees)).until(new MinVoltSupplier(leftLeader.getBusVoltage()));
     }
+
+     /**
+     * Drives a certain distance.
+     *
+     * @param meters : distance to drive.
+     * @return A command that drives a certain distance.
+     */
+    public Command rotateDegreesCommand(double x, double y) {
+        return Commands.run(() -> rotateDegrees(x,y)).until(new MinVoltSupplier(leftLeader.getBusVoltage()));
+    }
+
 }
