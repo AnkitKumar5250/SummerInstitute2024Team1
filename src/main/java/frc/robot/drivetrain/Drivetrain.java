@@ -7,20 +7,24 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
 import frc.robot.Position;
-import static frc.robot.Constants.*;
-
-import static frc.robot.drivetrain.DrivetrainConstants.*;
+import static frc.robot.drivetrain.DrivetrainConstants.RightEncoderSourceA;
+import static frc.robot.drivetrain.DrivetrainConstants.RightEncoderSourceB;
+import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
+import static frc.robot.drivetrain.DrivetrainConstants.leftEncoderSourceA;
+import static frc.robot.drivetrain.DrivetrainConstants.leftEncoderSourceB;
+import static frc.robot.drivetrain.DrivetrainConstants.moveD;
+import static frc.robot.drivetrain.DrivetrainConstants.moveI;
+import static frc.robot.drivetrain.DrivetrainConstants.moveP;
 
 /**
  * The Drivetrain Subsystem.
@@ -87,7 +91,7 @@ public class Drivetrain extends SubsystemBase {
      * @return voltage of the motors.
      */
     public double driveDistance(Measure<Distance> distance) {
-        double voltage = 0;
+        double voltage;
         double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
         voltage = pidControllerTranslation.calculate(encoderValue, distance.in(Meters));
 
@@ -182,7 +186,6 @@ public class Drivetrain extends SubsystemBase {
     public Command rotateDegreesCommand(Measure<Angle> angle, boolean negate) {
         if (negate) {
             angle = Degrees.of(-angle.in(Degrees));
-            ;
         }
         Measure<Angle> nAngle = angle;
 
