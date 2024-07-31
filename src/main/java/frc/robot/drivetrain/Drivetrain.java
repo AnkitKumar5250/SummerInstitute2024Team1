@@ -10,13 +10,15 @@ import edu.wpi.first.units.Measure;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Position;
-import frc.robot.Suppliers.MinVoltSupplier;
+import static frc.robot.Constants.*;
 
 import static frc.robot.drivetrain.DrivetrainConstants.*;
 
@@ -156,7 +158,8 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public Command driveDistanceCommand(Measure<Distance> distance) {
-        return Commands.run(() -> driveDistance(distance)).until(new MinVoltSupplier(leftLeader.getBusVoltage()));
+        return Commands.run(() -> driveDistance(distance))
+                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
     /**
@@ -166,7 +169,8 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public Command rotateDegreesCommand(Measure<Angle> angle) {
-        return Commands.run(() -> rotateDegrees(angle)).until(new MinVoltSupplier(leftLeader.getBusVoltage()));
+        return Commands.run(() -> rotateDegrees(angle))
+                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
     /**
@@ -177,11 +181,13 @@ public class Drivetrain extends SubsystemBase {
      */
     public Command rotateDegreesCommand(Measure<Angle> angle, boolean negate) {
         if (negate) {
-            angle = Degrees.of(-angle.in(Degrees));;
+            angle = Degrees.of(-angle.in(Degrees));
+            ;
         }
         Measure<Angle> nAngle = angle;
 
-        return Commands.run(() -> rotateDegrees(nAngle)).until(new MinVoltSupplier(leftLeader.getBusVoltage()));
+        return Commands.run(() -> rotateDegrees(nAngle))
+                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
     /**
@@ -190,9 +196,8 @@ public class Drivetrain extends SubsystemBase {
      */
     public Command rotateTowardsBankCommand() {
         return Commands.run(() -> rotateTowardsBank())
-                .until(new MinVoltSupplier(leftLeader.getBusVoltage()));
+                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
-    
 
     /**
      * Faces robot towards a certain position.
@@ -202,7 +207,7 @@ public class Drivetrain extends SubsystemBase {
      */
     public Command rotateTowardsPositionCommand(Measure<Distance> x, Measure<Distance> y) {
         return Commands.run(() -> rotateTowardsPosition(x, y))
-                .until(new MinVoltSupplier(leftLeader.getBusVoltage()));
+                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
 }

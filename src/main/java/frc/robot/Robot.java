@@ -34,24 +34,10 @@ public class Robot extends CommandRobot {
       Ports.OperatorConstants.OperatorControllerPort);
 
   /**
-   * This function is called every 20 ms, no matter the mode. Use this for items
-   * like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>
-   * This runs after the mode specific periodic functions, but before LiveWindow
-   * and
-   * SmartDashboard integrated updating.
+   * This function is called every 20 ms, no matter the mode.
    */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler. This is responsible for polling buttons, adding
-    // newly-scheduled
-    // commands, running already-scheduled commands, removing finished or
-    // interrupted commands,
-    // and running subsystem periodic() methods. This must be called from the
-    // robot's periodic
-    // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
   }
 
@@ -87,6 +73,9 @@ public class Robot extends CommandRobot {
     }
   }
 
+  /**
+   * Command to prepare the intake
+   */
   private Command IntakeCommand() {
     return intake.extend()
         .alongWith(intake.runIntake())
@@ -94,6 +83,9 @@ public class Robot extends CommandRobot {
         .finallyDo(() -> intake.retract());
   }
 
+  /**
+   * Command to prepare the shooter
+   */
   private Command ShootCommand() {
     return drivetrain
         .rotateTowardsBankCommand()

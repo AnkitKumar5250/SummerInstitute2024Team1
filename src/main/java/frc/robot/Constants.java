@@ -76,7 +76,7 @@ public final class Constants {
     public static final Measure<Distance> TARGET_Z = Inches.of(0);
 
     public static final Measure<Distance> BALL_RADIUS = Inches.of(0);
-
-    public static final Measure<Voltage> MINIMUM_VOLTAGE_THRESHHOLD = Volts.of(0.1);
   }
+
+  public static final Measure<Voltage> MINIMUM_VOLTAGE_THRESHHOLD = Volts.of(0.1);
 }

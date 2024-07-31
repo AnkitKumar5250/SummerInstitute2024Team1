@@ -15,7 +15,7 @@ public class Position {
     public static Measure<Distance> X = Meters.of(0);
     public static Measure<Distance> Y = Meters.of(0);
     public static Measure<Angle> angle = Degrees.of(0);
-
+    
     /**
      * Calculates the relative angle between the robot's current position and the
      * bank.

@@ -10,7 +10,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Position;
-import frc.robot.Suppliers.MinVoltSupplier;
 
 import static frc.robot.Ports.Shooter.*;
 import static frc.robot.shooter.ShooterConstants.*;
@@ -18,32 +17,24 @@ import static frc.robot.shooter.ShooterConstants.*;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.*;
 import static frc.robot.Constants.FieldConstants.*;
 
-// The shooter is to be manually tuned once the robot is all set and working.
-
-// Because of physics(and according to team 254's tech binder) this tuning -
-// process only really has to be done for one specific distance, as all of -
-// the other distances can be calculated based on this one. 
-
-// Drivetrain needs to add encoders in order to determine the angle at -
-// which to shoot(since we need our position relative to the goal)
-// Also some weird math is required in order to make sure that we get it -
-// into the square. Therefore we just have to aim for the orgin
 
 public class Shooter extends SubsystemBase {
+    // Instantiate motor
     private final CANSparkMax motor = new CANSparkMax(motorPort, MotorType.kBrushless);
+
+    // Instantiate encoder
     private final RelativeEncoder encoder = motor.getEncoder();
+
+    // Instantiate PID Controller
     private final PIDController pid = new PIDController(kP, kI, kD);
 
     /**
-     * calculates the amount of power neccesary to score the cell into the bank
-     * 
-     * @param x the current X position of the robot on the field (requires
-     *          drivetrain input)
-     * @param y the current Y position of the robot on the field (requires
-     *          drivetrain input)
-     * @return the amount of power neccesary to score the cell into the bank
+     * Calculates the amount of power neccesary to score the cell into the bank.
+     * @return The power that the ball needs to be launched at.
      */
     public double calcVelocity() {
         Measure<Distance> xDifference = Meter.of(Math.abs(Position.X.in(Meters) - TARGET_X.in(Meters)));
@@ -59,54 +50,45 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * constructor
+     * Constructor.
      */
     public Shooter() {
 
     }
 
     /**
-     * turns off the motor
+     * Turns off the motor.
      */
     public Command turnOff() {
-        return run(() -> motor.stopMotor());
+        return runOnce(() -> motor.stopMotor());
     }
 
     /**
-     * returns the speed of the motor in rotations per second
-     * 
-     * @return speed of the motor in rotations per second
+     * Returns the velocity of the motor in RPM.
+     * @return The velocity of the motor.
      */
     public double getVelocity() {
         return encoder.getVelocity();
     }
 
     /**
-     * sets the speed of the motor using PID
-     * 
-     * @param velocity the target speed of the motor
+     * Sets the velocity of the motor using PID.
+     * @param velocity The target velocity of the motor.
      */
     public Command setVelocity(double velocity) {
         return run(() -> motor.setVoltage(pid.calculate(getVelocity(), velocity)))
-                .until(new MinVoltSupplier(motor.getBusVoltage()));
+                .until(() ->  motor.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
     /**
-     * sets the speed of the motor using PID
-     * 
-     * @param velocity the target speed of the motor
+     * Sets the velocity of the motor appropriate for scoring.
      */
     public Command setVelocity() {
-        return run(() -> updateVelocity()).until(new MinVoltSupplier(motor.getBusVoltage()));
+        return run(() -> updateVelocity()).until(() ->  motor.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
     /**
-     * Updates the speed of the motor based on the position of the robot
-     * 
-     * @param x X position of robot on the field
-     * @param y Y position of robot on the field
-     * @return a command that updates the speed of the motor based on the position
-     *         of the robot
+     * Updates the velocity of the motor based on PID in order to score.
      */
     public double updateVelocity() {
         double voltage = pid.calculate(getVelocity(), calcVelocity());
