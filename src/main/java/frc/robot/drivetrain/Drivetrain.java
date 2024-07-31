@@ -15,8 +15,9 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.vision.Vision;
+
 import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
-import frc.robot.Position;
 import static frc.robot.drivetrain.DrivetrainConstants.RightEncoderSourceA;
 import static frc.robot.drivetrain.DrivetrainConstants.RightEncoderSourceB;
 import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
@@ -126,7 +127,7 @@ public class Drivetrain extends SubsystemBase {
      * Updates voltage based on PID in order to fufill rotation command.
      */
     public void rotateTowardsBank() {
-        rotateDegrees(Position.calcAngleTowardsBank());
+        rotateDegrees(Vision.calcAngleTowardsBank());
     }
 
     /**
@@ -136,11 +137,11 @@ public class Drivetrain extends SubsystemBase {
      * @param y : refrence point Y.
      */
     public void rotateTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
-        rotateDegrees(Position.calcAngleTowardsPosition(x, y));
+        rotateDegrees(Vision.calcAngleTowardsPosition(x, y));
     }
 
-    public void updatePosition(boolean rotating) {
-        
+    public void updateRotation() {
+       
     }
 
     /**

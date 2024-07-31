@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,8 +12,12 @@ import frc.robot.Constants.FieldConstants;
 /**
  * This is utility class designed to aid in accurately positioning the robot.
  */
-public class Position {
-    public static Pose2d ROBOT = new Pose2d(Meters.of(0), Meters.of(0), new Rotation2d(Degrees.of(0)));
+public class Vision {
+    public static class Robot {
+        public static Pose2d POSITION = new Pose2d(Meters.of(0), Meters.of(0), new Rotation2d(Degrees.of(0)));
+        public static Pose2d ORIENTATION = new Pose2d(Meters.of(0), Meters.of(0), new Rotation2d(Degrees.of(0)));
+    }
+   
     
     /**
      * Calculates the relative angle between the robot's current position and the
@@ -24,7 +28,7 @@ public class Position {
      * @return The angle.
      */
     public static Measure<Angle> calcAngleTowardsBank() {
-        return Degrees.of(Math.atan(FieldConstants.BANK_POSITION.getX() - ROBOT.getX()/ 156 - ROBOT.getY()));
+        return Degrees.of(Math.atan(FieldConstants.BANK_POSITION.getX() - Robot.POSITION.getX()/ 156 - Robot.ORIENTATION.getY()));
     }
 
     /**
@@ -38,6 +42,6 @@ public class Position {
      * @return The angle.
      */
     public static Measure<Angle> calcAngleTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
-        return Degrees.of(Math.atan(x.in(Meters) - ROBOT.getX() / y.in(Meters) - ROBOT.getY()));
+        return Degrees.of(Math.atan(x.in(Meters) - Robot.POSITION.getX() / y.in(Meters) - Robot.POSITION.getY()));
     }
 }
