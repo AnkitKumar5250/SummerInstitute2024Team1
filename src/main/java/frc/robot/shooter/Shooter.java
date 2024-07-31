@@ -5,13 +5,19 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Position;
 import frc.robot.Suppliers.MinVoltSupplier;
 
 import static frc.robot.Ports.Shooter.*;
 import static frc.robot.shooter.ShooterConstants.*;
+
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.Constants.FieldConstants.*;
 
 // The shooter is to be manually tuned once the robot is all set and working.
@@ -39,11 +45,11 @@ public class Shooter extends SubsystemBase {
      *          drivetrain input)
      * @return the amount of power neccesary to score the cell into the bank
      */
-    public double calcVelocity(double x, double y) {
-        x = Math.abs(x - TARGET_X.in(Inches));
-        y = Math.abs(y - TARGET_Y.in(Inches));
+    public double calcVelocity() {
+        Measure<Distance> xDifference = Meter.of(Math.abs(Position.X.in(Meters) - TARGET_X.in(Meters)));
+        Measure<Distance> yDifference = Meters.of(Math.abs(Position.X.in(Meters) - TARGET_Y.in(Meters)));
 
-        double hDistance = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        double hDistance = Math.hypot(xDifference.in(Meters), yDifference.in(Meters));
         double vDistance = TARGET_Z.in(Inches) - SHOOTER_HEIGHT;
 
         double velocity = Math.sqrt((G * Math.pow(hDistance, 2) * Math.pow(1 / Math.cos(LAUNCH_ANGLE), 2))
@@ -90,8 +96,8 @@ public class Shooter extends SubsystemBase {
      * 
      * @param velocity the target speed of the motor
      */
-    public Command setVelocity(double x, double y) {
-        return run(() -> updateVelocity(x, y)).until(new MinVoltSupplier(motor.getBusVoltage()));
+    public Command setVelocity() {
+        return run(() -> updateVelocity()).until(new MinVoltSupplier(motor.getBusVoltage()));
     }
 
     /**
@@ -102,8 +108,8 @@ public class Shooter extends SubsystemBase {
      * @return a command that updates the speed of the motor based on the position
      *         of the robot
      */
-    public double updateVelocity(double x, double y) {
-        double voltage = pid.calculate(getVelocity(), calcVelocity(x, y));
+    public double updateVelocity() {
+        double voltage = pid.calculate(getVelocity(), calcVelocity());
         motor.setVoltage(voltage);
         return voltage;
     }

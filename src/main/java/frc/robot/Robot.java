@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -34,7 +32,6 @@ public class Robot extends CommandRobot {
       Ports.OperatorConstants.driverControllerPort);
   private static final CommandXboxController operator = new CommandXboxController(
       Ports.OperatorConstants.OperatorControllerPort);
-  private static Pose2d position = new Pose2d(0, 0, new Rotation2d());
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items
@@ -99,14 +96,14 @@ public class Robot extends CommandRobot {
 
   private Command ShootCommand() {
     return drivetrain
-        .rotateDegreesCommand(position.getX(), position.getY())
-        .alongWith(shooter.setVelocity(position.getX(), position.getY()))
-        .finallyDo(() -> drivetrain.rotateDegrees(-drivetrain.calcAngle(position.getX(), position.getY())));
+        .rotateTowardsBankCommand()
+        .alongWith(shooter.setVelocity())
+        .finallyDo(() -> drivetrain.rotateDegreesCommand(Position.calcAngleTowardsBank(), true));
   }
 
-  private Command MoveCommand(Pose2d pos) {
+  private Command MoveCommand() {
     // unfinished
-    return Commands.run(() -> MoveCommand(pos));
+    return Commands.run(() -> MoveCommand());
   }
 
   @SuppressWarnings("unused")
@@ -119,8 +116,8 @@ public class Robot extends CommandRobot {
   }
 
   @SuppressWarnings("unused")
-  private void Move(Pose2d pos) {
-    CommandScheduler.getInstance().schedule(MoveCommand(pos));
+  private void Move() {
+    CommandScheduler.getInstance().schedule(MoveCommand());
   }
 
 }
