@@ -90,7 +90,7 @@ public class Drivetrain extends SubsystemBase {
      * @param distance distance to drive the robot.
      * @return voltage of the motors.
      */
-    public double driveDistance(Measure<Distance> distance) {
+    public void driveDistance(Measure<Distance> distance) { //why did this return double?
         double voltage;
         double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
         voltage = pidControllerTranslation.calculate(encoderValue, distance.in(Meters));
@@ -101,17 +101,14 @@ public class Drivetrain extends SubsystemBase {
 
         leftLeader.set(voltage);
         rightLeader.set(voltage);
-
-        return voltage;
     }
 
     /**
      * Updates voltage based on PID in order to fufill rotation command.
      * 
      * @param angle : angle to rotate.
-     * @return voltage of the motors
      */
-    public double rotateDegrees(Measure<Angle> angle) {
+    public void rotateDegrees(Measure<Angle> angle) {
         double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
 
         double encoderValue = leftEncoder.get() + rightEncoder.get() / 2;
@@ -123,15 +120,13 @@ public class Drivetrain extends SubsystemBase {
 
         leftLeader.setVoltage(-voltage);
         rightLeader.setVoltage(voltage);
-
-        return voltage;
     }
 
     /**
      * Updates voltage based on PID in order to fufill rotation command.
      */
-    public double rotateTowardsBank() {
-        return rotateDegrees(Position.calcAngleTowardsBank());
+    public void rotateTowardsBank() {
+        rotateDegrees(Position.calcAngleTowardsBank());
     }
 
     /**
@@ -140,8 +135,12 @@ public class Drivetrain extends SubsystemBase {
      * @param x : refrence point X.
      * @param y : refrence point Y.
      */
-    public double rotateTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
-        return rotateDegrees(Position.calcAngleTowardsPosition(x, y));
+    public void rotateTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
+        rotateDegrees(Position.calcAngleTowardsPosition(x, y));
+    }
+
+    public void updatePosition(boolean rotating) {
+        
     }
 
     /**
