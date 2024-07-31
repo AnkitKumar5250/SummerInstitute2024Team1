@@ -10,6 +10,11 @@ import edu.wpi.first.units.Voltage;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -40,11 +45,8 @@ public final class Constants {
     // positive Y is up the field
     // positive X is to the right
 
-    public static final Measure<Distance> BANK_LENGTH = Inches.of(36);
-    public static final Measure<Distance> BANK_WIDTH = Inches.of(48);
-
-    public static final Measure<Distance> BANK_X = Inches.of(132);
-    public static final Measure<Distance> BANK_Y = Inches.of(90);
+    public static final Translation2d BANK_DIMENSIONS = new Translation2d(Inches.of(36),Inches.of(48));
+    public static final Translation2d BANK_POSITION = new Translation2d(Inches.of(132),Inches.of(90));
 
     public static final Measure<Distance> FIELD_LENGTH = Inches.of(312);
     public static final Measure<Distance> FIELD_WIDTH = Inches.of(180);
