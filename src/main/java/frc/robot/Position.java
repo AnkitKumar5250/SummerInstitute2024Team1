@@ -1,11 +1,12 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import frc.robot.Constants.FieldConstants;
 
 /**
@@ -14,7 +15,8 @@ import frc.robot.Constants.FieldConstants;
 public class Position {
     public static Measure<Distance> X = Meters.of(0);
     public static Measure<Distance> Y = Meters.of(0);
-    public static Measure<Angle> angle = Degrees.of(0);
+    public static Rotation2d angle = new Rotation2d(Degrees.of(0));
+    public static Pose2d ROBOT = new Pose2d(X, Y, angle);
     
     /**
      * Calculates the relative angle between the robot's current position and the

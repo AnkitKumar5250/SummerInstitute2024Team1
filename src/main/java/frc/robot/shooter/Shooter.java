@@ -1,25 +1,31 @@
 package frc.robot.shooter;
 
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Position;
-
-import static frc.robot.Ports.Shooter.*;
-import static frc.robot.shooter.ShooterConstants.*;
-
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.*;
-import static frc.robot.Constants.FieldConstants.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static frc.robot.Constants.FieldConstants.G;
+import static frc.robot.Constants.FieldConstants.TARGET_X;
+import static frc.robot.Constants.FieldConstants.TARGET_Y;
+import static frc.robot.Constants.FieldConstants.TARGET_Z;
+import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
+import static frc.robot.Ports.Shooter.motorPort;
+import frc.robot.Position;
+import static frc.robot.shooter.ShooterConstants.LAUNCH_ANGLE;
+import static frc.robot.shooter.ShooterConstants.POWER_COEFFICIENT;
+import static frc.robot.shooter.ShooterConstants.SHOOTER_HEIGHT;
+import static frc.robot.shooter.ShooterConstants.kD;
+import static frc.robot.shooter.ShooterConstants.kI;
+import static frc.robot.shooter.ShooterConstants.kP;
 
 
 public class Shooter extends SubsystemBase {

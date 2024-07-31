@@ -4,16 +4,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.Voltage;
-
-import static edu.wpi.first.units.Units.*;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -45,25 +42,24 @@ public final class Constants {
     // positive Y is up the field
     // positive X is to the right
 
-    public static final Translation2d BANK_DIMENSIONS = new Translation2d(Inches.of(36),Inches.of(48));
-    public static final Translation2d BANK_POSITION = new Translation2d(Inches.of(132),Inches.of(90));
+    public static final Measure<Distance> BANK_LENGTH = Inches.of(36);
+    public static final Measure<Distance> BANK_WIDTH = Inches.of(48);
+    
+    public static final Measure<Distance> BANK_X = Inches.of(132);
+    public static final Measure<Distance> BANK_Y = Inches.of(90);
+
+    public static final Translation2d BANK = new Translation2d(Inches.of(132), Inches.of(90));
 
     public static final Measure<Distance> FIELD_LENGTH = Inches.of(312);
     public static final Measure<Distance> FIELD_WIDTH = Inches.of(180);
 
     // dimensions of field
 
-    public static final Measure<Distance> FIELD_X = Inches.of(0);
-    public static final Measure<Distance> FIELD_Y = Inches.of(0);
-
     public static final Measure<Distance> HUMAN_PLAYER_ZONE_LENGTH = Inches.of(24);
     public static final Measure<Distance> HUMAN_PLAYER_ZONE_WIDTH = Inches.of(36);
 
-    public static final Measure<Distance> HUMAN_PLAYER_ZONE_X = Inches.of(90);
-    public static final Measure<Distance> HUMAN_PLAYER_ZONE_Y = Inches.of(-156);
-
-    public static final Measure<Distance> CELL_BANK_ZONE_LENGTH = Inches.of(87);
-    public static final Measure<Distance> CELL_BANK_ZONE_WIDTH = Inches.of(180);
+    // public static final Measure<Distance> CELL_BANK_ZONE_LENGTH = Inches.of(87);
+    // public static final Measure<Distance> CELL_BANK_ZONE_WIDTH = Inches.of(180);
 
     public static final Measure<Distance> MID_ZONE_LENGTH = Inches.of(68);
     public static final Measure<Distance> MID_ZONE_WIDTH = Inches.of(180);
@@ -77,7 +73,7 @@ public final class Constants {
     public static final Measure<Distance> TARGET_Y = Inches.of(0);
     public static final Measure<Distance> TARGET_Z = Inches.of(0);
 
-    public static final Measure<Distance> BALL_RADIUS = Inches.of(0);
+    public static final Translation3d TARGET = new Translation3d(BANK_X, BANK_Y, BANK_X);
   }
 
   public static final Measure<Voltage> MINIMUM_VOLTAGE_THRESHHOLD = Volts.of(0.1);
