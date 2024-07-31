@@ -14,9 +14,7 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.FieldConstants.G;
-import static frc.robot.Constants.FieldConstants.TARGET_X;
-import static frc.robot.Constants.FieldConstants.TARGET_Y;
-import static frc.robot.Constants.FieldConstants.TARGET_Z;
+import static frc.robot.Constants.FieldConstants.TARGET;
 import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
 import static frc.robot.Ports.Shooter.motorPort;
 import frc.robot.Position;
@@ -43,11 +41,11 @@ public class Shooter extends SubsystemBase {
      * @return The power that the ball needs to be launched at.
      */
     public double calcVelocity() {
-        Measure<Distance> xDifference = Meter.of(Math.abs(Position.X.in(Meters) - TARGET_X.in(Meters)));
-        Measure<Distance> yDifference = Meters.of(Math.abs(Position.X.in(Meters) - TARGET_Y.in(Meters)));
+        Measure<Distance> xDifference = Meter.of(Math.abs(Position.ROBOT.getX() - TARGET.getX()));
+        Measure<Distance> yDifference = Meters.of(Math.abs(Position.ROBOT.getX() - TARGET.getX()));
 
         double hDistance = Math.hypot(xDifference.in(Meters), yDifference.in(Meters));
-        double vDistance = TARGET_Z.in(Inches) - SHOOTER_HEIGHT;
+        double vDistance = TARGET.getZ() - SHOOTER_HEIGHT;
 
         double velocity = Math.sqrt((G * Math.pow(hDistance, 2) * Math.pow(1 / Math.cos(LAUNCH_ANGLE), 2))
                 / (2 * (Math.tan(LAUNCH_ANGLE) * hDistance - vDistance)));

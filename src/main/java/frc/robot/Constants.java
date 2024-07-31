@@ -44,11 +44,8 @@ public final class Constants {
 
     public static final Measure<Distance> BANK_LENGTH = Inches.of(36);
     public static final Measure<Distance> BANK_WIDTH = Inches.of(48);
-    
-    public static final Measure<Distance> BANK_X = Inches.of(132);
-    public static final Measure<Distance> BANK_Y = Inches.of(90);
 
-    public static final Translation2d BANK = new Translation2d(Inches.of(132), Inches.of(90));
+    public static final Translation2d BANK_POSITION = new Translation2d(Inches.of(132), Inches.of(90));
 
     public static final Measure<Distance> FIELD_LENGTH = Inches.of(312);
     public static final Measure<Distance> FIELD_WIDTH = Inches.of(180);
@@ -58,8 +55,8 @@ public final class Constants {
     public static final Measure<Distance> HUMAN_PLAYER_ZONE_LENGTH = Inches.of(24);
     public static final Measure<Distance> HUMAN_PLAYER_ZONE_WIDTH = Inches.of(36);
 
-    // public static final Measure<Distance> CELL_BANK_ZONE_LENGTH = Inches.of(87);
-    // public static final Measure<Distance> CELL_BANK_ZONE_WIDTH = Inches.of(180);
+    public static final Measure<Distance> CELL_BANK_ZONE_LENGTH = Inches.of(87);
+    public static final Measure<Distance> CELL_BANK_ZONE_WIDTH = Inches.of(180);
 
     public static final Measure<Distance> MID_ZONE_LENGTH = Inches.of(68);
     public static final Measure<Distance> MID_ZONE_WIDTH = Inches.of(180);
@@ -69,11 +66,7 @@ public final class Constants {
 
     public static final double G = 9.81; // meters per second^2
 
-    public static final Measure<Distance> TARGET_X = Inches.of(0);
-    public static final Measure<Distance> TARGET_Y = Inches.of(0);
-    public static final Measure<Distance> TARGET_Z = Inches.of(0);
-
-    public static final Translation3d TARGET = new Translation3d(BANK_X, BANK_Y, BANK_X);
+    public static final Translation3d TARGET = new Translation3d(Inches.of(0), Inches.of(0), Inches.of(0));
   }
 
   public static final Measure<Voltage> MINIMUM_VOLTAGE_THRESHHOLD = Volts.of(0.1);
