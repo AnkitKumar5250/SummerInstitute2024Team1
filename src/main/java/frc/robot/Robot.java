@@ -32,6 +32,7 @@ public class Robot extends CommandRobot {
 
   private static final CommandXboxController driver = new CommandXboxController(
       Ports.OperatorConstants.driverControllerPort);
+  @SuppressWarnings("unused")
   private static final CommandXboxController operator = new CommandXboxController(
       Ports.OperatorConstants.OperatorControllerPort);
 
@@ -61,8 +62,9 @@ public class Robot extends CommandRobot {
 
   @Override
   public void teleopInit() {
-    // Cancels all autonomous commands at the beggining of telo
+    // Cancels all autonomous commands at the beggining of telop
     CommandScheduler.getInstance().cancelAll();
+    Actions.configureBindings(operator);
     drivetrain.setDefaultCommand(drivetrain.driveCommand(driver.getLeftY(), driver.getRightY()));
   }
 

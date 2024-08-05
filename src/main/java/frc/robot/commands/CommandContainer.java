@@ -29,7 +29,7 @@ public class CommandContainer {
     }
 
 
-    private void configureBindings(CommandXboxController operator) {
+    public void configureBindings(CommandXboxController operator) {
         operator.a().whileTrue(IntakeCommand());
     }
 
@@ -104,7 +104,7 @@ public class CommandContainer {
      * 
      * @param angle : angle to rotate to.
      */
-    private void RotateTO(Measure<Angle> angle) {
+    public void RotateTo(Measure<Angle> angle) {
         RotateCommand(angle);
     }
 }
