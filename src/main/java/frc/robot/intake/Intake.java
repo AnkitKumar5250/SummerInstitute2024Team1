@@ -6,6 +6,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,6 +21,7 @@ public class Intake extends SubsystemBase {
     CANSparkMax roller = new CANSparkMax(rollerPort, MotorType.kBrushless);
     CANSparkMax pivot = new CANSparkMax(pivotPort, MotorType.kBrushless);
 
+    private final PIDController intakePID = new PIDController(intakeP, intakeI, intakeD);
     public Intake() {
         pivotEncoder = pivot.getAbsoluteEncoder();
     }
@@ -27,12 +29,17 @@ public class Intake extends SubsystemBase {
     // Add PID to all three of these methods pls
 
     // Extends until a certain "angle" is reached
+
+    /**
+     * method that extends the pivot
+     * @return command to extend pivot
+     */
     public Command extend() {
         return runOnce(
-                () -> pivot.set(.5)).andThen(
+                () -> pivot.set(intakePID.calculate(pivot.get(), stopPoint))).andThen(
                         //
-                        Commands.waitUntil(() -> pivotEncoder.getPosition() >= stopPoint)
-                                .andThen(() -> pivot.set(0)));
+                        
+                                .andThen(() -> pivot.set(intakePID.calculate(pivot.get(), 0)));
     }
 
     // Retracts until the original point

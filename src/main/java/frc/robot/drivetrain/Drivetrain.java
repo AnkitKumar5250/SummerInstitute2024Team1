@@ -44,10 +44,6 @@ public class Drivetrain extends SubsystemBase {
     private final Encoder leftEncoder = new Encoder(leftEncoderSourceA, leftEncoderSourceB);
     private final Encoder rightEncoder = new Encoder(RightEncoderSourceA, RightEncoderSourceB);
 
-    // used for tracking
-    private double prevLeftEncoder;
-    private double prevRightEncoder;
-
     // Instantiates PID controllers
     private final PIDController pidControllerRotation = new PIDController(1, 0, 1);
     private final PIDController pidControllerTranslation = new PIDController(moveP, moveI, moveD);
@@ -79,16 +75,6 @@ public class Drivetrain extends SubsystemBase {
      */
     public void tankDrive(double leftSpeed, double rightSpeed) {
         DiffDrive.tankDrive(leftSpeed, -rightSpeed);
-    }
-
-    public double calcEncoderDifference() {
-        double currEncoderValue = Math.abs(rightEncoder.get());
-        double prevEncoderValue = prevLeftEncoder + prevRightEncoder / 2;
-
-        prevLeftEncoder = Math.abs(leftEncoder.get());
-        prevRightEncoder = Math.abs(rightEncoder.get());
-
-        return currEncoderValue - prevEncoderValue;
     }
 
     public void updateRobotPosition(double encoderValue, boolean isRotating) {
@@ -176,23 +162,6 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Updates voltage based on PID in order to fufill rotation command.
-     */
-    public void rotateTowardsBank() {
-        rotate(Vision.calcAngleTowardsBank());
-    }
-
-    /**
-     * Updates voltage based on PID in order to fufill rotation command.
-     * 
-     * @param x : refrence point X.
-     * @param y : refrence point Y.
-     */
-    public void rotateTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
-        rotate(Vision.calcAngleTowardsPosition(x, y));
-    }
-
-    /**
      * Drives based on driver input.
      * 
      * @param leftSpeed  Y-axis of left joystick.
@@ -210,6 +179,9 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public Command driveDistanceCommand(Measure<Distance> distance) {
+        leftEncoder.reset();
+        rightEncoder.reset();
+
         return Commands.run(() -> drive(distance))
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
@@ -221,6 +193,9 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public Command rotateDegreesCommand(Measure<Angle> angle) {
+        leftEncoder.reset();
+        rightEncoder.reset();
+
         return Commands.run(() -> rotate(angle))
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
@@ -233,6 +208,9 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public Command rotateDegreesCommand(Measure<Angle> angle, boolean negate) {
+        leftEncoder.reset();
+        rightEncoder.reset();
+
         return Commands.run(() -> rotate(angle))
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
@@ -242,7 +220,10 @@ public class Drivetrain extends SubsystemBase {
      * 
      */
     public Command rotateTowardsBankCommand() {
-        return Commands.run(() -> rotateTowardsBank())
+        leftEncoder.reset();
+        rightEncoder.reset();
+
+        return Commands.run(() ->  rotate(Vision.calcAngleTowardsBank()))
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
@@ -253,7 +234,10 @@ public class Drivetrain extends SubsystemBase {
      * @param y : refrence point Y.
      */
     public Command rotateTowardsPositionCommand(Measure<Distance> x, Measure<Distance> y) {
-        return Commands.run(() -> rotateTowardsPosition(x, y))
+        leftEncoder.reset();
+        rightEncoder.reset();
+
+        return Commands.run(() ->  rotate(Vision.calcAngleTowardsPosition(x, y)))
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
