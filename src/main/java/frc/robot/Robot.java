@@ -12,8 +12,8 @@ import frc.lib.CommandRobot;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.elevator.Elevator;
 import frc.robot.intake.Intake;
+import frc.robot.positioning.Positioning;
 import frc.robot.shooter.Shooter;
-import frc.robot.vision.Vision;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -91,7 +91,7 @@ public class Robot extends CommandRobot {
     return drivetrain
         .rotateTowardsBankCommand()
         .alongWith(shooter.setVelocity())
-        .finallyDo(() -> drivetrain.rotateDegreesCommand(Vision.calcAngleTowardsBank(), true));
+        .finallyDo(() -> drivetrain.rotateDegreesCommand(Positioning.calcAngleTowardsBank(), true));
   }
 
   private Command MoveCommand() {

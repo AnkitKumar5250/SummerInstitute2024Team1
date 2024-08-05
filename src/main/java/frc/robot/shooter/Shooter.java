@@ -7,12 +7,12 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Volts;
+import edu.wpi.first.units.Velocity;
+
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.vision.Vision;
+import frc.robot.positioning.Positioning;
 
 import static frc.robot.Constants.FieldConstants.G;
 import static frc.robot.Constants.FieldConstants.TARGET;
@@ -24,7 +24,6 @@ import static frc.robot.shooter.ShooterConstants.SHOOTER_HEIGHT;
 import static frc.robot.shooter.ShooterConstants.kD;
 import static frc.robot.shooter.ShooterConstants.kI;
 import static frc.robot.shooter.ShooterConstants.kP;
-
 
 public class Shooter extends SubsystemBase {
     // Instantiate motor
@@ -38,17 +37,18 @@ public class Shooter extends SubsystemBase {
 
     /**
      * Calculates the amount of power neccesary to score the cell into the bank.
+     * 
      * @return The power that the ball needs to be launched at.
      */
     public double calcVelocity() {
-        Measure<Distance> xDifference = Meter.of(Math.abs(Vision.Robot.getX() - TARGET.getX()));
-        Measure<Distance> yDifference = Meters.of(Math.abs(Vision.Robot.getX() - TARGET.getX()));
+        Measure<Distance> xDifference = Meter.of(Math.abs(Positioning.robot.getX() - TARGET.getX()));
+        Measure<Distance> yDifference = Meters.of(Math.abs(Positioning.robot.getX() - TARGET.getX()));
 
-        double hDistance = Math.hypot(xDifference.in(Meters), yDifference.in(Meters));
-        double vDistance = TARGET.getZ() - SHOOTER_HEIGHT;
+        Measure<Distance> hDistance = Meters.of(Math.hypot(xDifference.in(Meters), yDifference.in(Meters)));
+        Measure<Distance> vDistance = Meters.of(TARGET.getZ() - SHOOTER_HEIGHT.in(Meters));
 
-        double velocity = Math.sqrt((G * Math.pow(hDistance, 2) * Math.pow(1 / Math.cos(LAUNCH_ANGLE), 2))
-                / (2 * (Math.tan(LAUNCH_ANGLE) * hDistance - vDistance)));
+        double velocity = Math.sqrt((G * Math.pow(hDistance.in(Meters), 2) * Math.pow(1 / Math.cos(LAUNCH_ANGLE.in(Degrees)), 2))
+                / (2 * (Math.tan(LAUNCH_ANGLE.in(Degrees)) * hDistance.in(Meters) - vDistance.in(Meters))));
         velocity *= POWER_COEFFICIENT;
         return velocity;
     }
@@ -57,7 +57,7 @@ public class Shooter extends SubsystemBase {
      * Constructor.
      */
     public Shooter() {
-
+        
     }
 
     /**
@@ -69,6 +69,7 @@ public class Shooter extends SubsystemBase {
 
     /**
      * Returns the velocity of the motor in RPM.
+     * 
      * @return The velocity of the motor.
      */
     public double getVelocity() {
@@ -77,18 +78,19 @@ public class Shooter extends SubsystemBase {
 
     /**
      * Sets the velocity of the motor using PID.
+     * 
      * @param velocity The target velocity of the motor.
      */
-    public Command setVelocity(double velocity) {
-        return run(() -> motor.setVoltage(pid.calculate(getVelocity(), velocity)))
-                .until(() ->  motor.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+    public Command setVelocity(Measure<Velocity<Distance>> velocity) {
+        return run(() -> motor.setVoltage(pid.calculate(getVelocity(), velocity.in(MetersPerSecond))))
+                .until(() -> motor.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
     /**
      * Sets the velocity of the motor appropriate for scoring.
      */
     public Command setVelocity() {
-        return run(() -> updateVelocity()).until(() ->  motor.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+        return run(() -> updateVelocity()).until(() -> motor.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
     /**

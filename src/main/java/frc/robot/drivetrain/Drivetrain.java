@@ -4,9 +4,11 @@ import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -15,7 +17,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.vision.Vision;
+import frc.robot.positioning.Positioning;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
@@ -30,7 +32,12 @@ public class Drivetrain extends SubsystemBase {
     private final CANSparkMax leftFollower = new CANSparkMax(1, kBrushless);
     private final CANSparkMax rightLeader = new CANSparkMax(2, kBrushless);
     private final CANSparkMax rightFollower = new CANSparkMax(3, kBrushless);
-    private final DifferentialDrive DiffDrive = new DifferentialDrive(leftLeader, rightLeader);
+
+    // Instantiates Differential Drive
+    private final DifferentialDrive diffDrive = new DifferentialDrive(leftLeader, rightLeader);
+
+    // Instantiates Odometry
+    // private final DifferentialDriveOdometry diffDriveOdometry = new 
 
     // Instantiates encoders
     private final Encoder leftEncoder = new Encoder(leftEncoderSourceA, leftEncoderSourceB);
@@ -66,24 +73,7 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public void tankDrive(double leftSpeed, double rightSpeed) {
-        DiffDrive.tankDrive(leftSpeed, -rightSpeed);
-    }
-
-    public void updateRobotPosition(double encoderValue, boolean isRotating) {
-        Rotation2d rotation = new Rotation2d();
-        Translation2d translation = new Translation2d();
-        Transform2d transform;
-        if (isRotating) {
-            rotation = new Rotation2d(encoderValue / (TURNING_RADIUS * 2 * Math.PI / 360));
-        }
-        if (!isRotating) {
-            double xComp = Vision.Robot.getRotation().getCos() * encoderValue;
-            double yComp = Vision.Robot.getRotation().getSin() * encoderValue;
-            translation = new Translation2d(xComp, yComp);
-        }
-
-        transform = new Transform2d(translation, rotation);
-        Vision.Robot.transformBy(transform);
+        diffDrive.tankDrive(leftSpeed, -rightSpeed);
     }
 
     /**
@@ -104,7 +94,7 @@ public class Drivetrain extends SubsystemBase {
         leftLeader.set(voltage);
         rightLeader.set(voltage);
 
-        updateRobotPosition(encoderValue, false);
+        Positioning.updateRobotPosition(encoderValue, false);
     }
 
     /**
@@ -116,7 +106,7 @@ public class Drivetrain extends SubsystemBase {
         double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
 
         double encoderValue = Math.abs(rightEncoder.getDistance());
-        double voltage = pidControllerRotation.calculate(encoderValue / 2, distance);
+        double voltage = pidControllerRotation.calculate(encoderValue, distance);
 
         if (Math.abs(voltage) > 1) {
             voltage = Math.copySign(1, voltage);
@@ -125,7 +115,7 @@ public class Drivetrain extends SubsystemBase {
         leftLeader.setVoltage(-voltage);
         rightLeader.setVoltage(voltage);
 
-        updateRobotPosition(encoderValue, true);
+        Positioning.updateRobotPosition(encoderValue, true);
     }
 
     /**
@@ -138,7 +128,7 @@ public class Drivetrain extends SubsystemBase {
         double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
 
         double encoderValue = Math.abs(rightEncoder.getDistance());
-        double voltage = pidControllerRotation.calculate(encoderValue / 2, distance);
+        double voltage = pidControllerRotation.calculate(encoderValue, distance);
 
         if (Math.abs(voltage) > 1) {
             voltage = Math.copySign(1, voltage);
@@ -151,7 +141,7 @@ public class Drivetrain extends SubsystemBase {
             rightLeader.setVoltage(voltage);
         }
 
-        updateRobotPosition(encoderValue, true);
+        Positioning.updateRobotPosition(encoderValue, true);
     }
 
     /**
@@ -216,7 +206,7 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() ->  rotate(Vision.calcAngleTowardsBank()))
+        return Commands.run(() ->  rotate(Positioning.calcAngleTowardsBank()))
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
@@ -230,7 +220,7 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() ->  rotate(Vision.calcAngleTowardsPosition(x, y)))
+        return Commands.run(() ->  rotate(Positioning.calcAngleTowardsPosition(x, y)))
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
