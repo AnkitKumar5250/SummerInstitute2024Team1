@@ -10,16 +10,24 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.vision.Vision;
-
-import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
-import static frc.robot.drivetrain.DrivetrainConstants.*;
+import static frc.robot.drivetrain.DrivetrainConstants.RightEncoderSourceA;
+import static frc.robot.drivetrain.DrivetrainConstants.RightEncoderSourceB;
+import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
+import static frc.robot.drivetrain.DrivetrainConstants.leftEncoderSourceA;
+import static frc.robot.drivetrain.DrivetrainConstants.leftEncoderSourceB;
+import static frc.robot.drivetrain.DrivetrainConstants.moveD;
+import static frc.robot.drivetrain.DrivetrainConstants.moveI;
+import static frc.robot.drivetrain.DrivetrainConstants.moveP;
+import frc.robot.vision.Vision;
 
 /**
  * The Drivetrain Subsystem.
@@ -89,8 +97,7 @@ public class Drivetrain extends SubsystemBase {
         Transform2d transform;
         if (isRotating) {
             rotation = new Rotation2d(encoderValue / (TURNING_RADIUS * 2 * Math.PI / 360));
-        }
-        if (!isRotating) {
+        }else{
             double xComp = Vision.Robot.getRotation().getCos() * encoderValue;
             double yComp = Vision.Robot.getRotation().getSin() * encoderValue;
             translation = new Translation2d(xComp, yComp);
