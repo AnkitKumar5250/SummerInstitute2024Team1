@@ -4,10 +4,6 @@ import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
@@ -20,9 +16,9 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static frc.robot.Ports.Drive.*;
 import frc.robot.positioning.Positioning;
 
-import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
 import static frc.robot.drivetrain.DrivetrainConstants.*;
 
@@ -31,16 +27,15 @@ import static frc.robot.drivetrain.DrivetrainConstants.*;
  */
 public class Drivetrain extends SubsystemBase {
     // Instantiates motors
-    private final CANSparkMax leftLeader = new CANSparkMax(0, kBrushless);
-    private final CANSparkMax leftFollower = new CANSparkMax(1, kBrushless);
-    private final CANSparkMax rightLeader = new CANSparkMax(2, kBrushless);
-    private final CANSparkMax rightFollower = new CANSparkMax(3, kBrushless);
+    private final CANSparkMax leftLeader = new CANSparkMax(leftLeaderID, kBrushless);
+    private final CANSparkMax leftFollower = new CANSparkMax(leftFollowerID, kBrushless);
+    private final CANSparkMax rightLeader = new CANSparkMax(RightLeaderID, kBrushless);
+    private final CANSparkMax rightFollower = new CANSparkMax(RightFollowerID, kBrushless);
 
     // Instantiates Differential Drive
     private final DifferentialDrive diffDrive = new DifferentialDrive(leftLeader, rightLeader);
 
-    // Instantiates Odometry
-    // private final DifferentialDriveOdometry diffDriveOdometry = new 
+    
 
     // Instantiates encoders
     private final Encoder leftEncoder = new Encoder(leftEncoderSourceA, leftEncoderSourceB);

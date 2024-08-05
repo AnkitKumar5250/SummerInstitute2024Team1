@@ -20,6 +20,11 @@ public final class Ports {
         public static final int leftEncoderSourceB = 0;
         public static final int RightEncoderSourceA = 0;
         public static final int RightEncoderSourceB = 0;
+
+        public static final int leftLeaderID = 0;
+        public static final int RightLeaderID = 0;
+        public static final int leftFollowerID = 0;
+        public static final int RightFollowerID = 0;
     }
     public static class OperatorConstants {
         public static final int driverControllerPort = 0;
