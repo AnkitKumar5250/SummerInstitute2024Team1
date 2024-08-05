@@ -4,14 +4,12 @@ import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,15 +17,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.vision.Vision;
 
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
-import static frc.robot.drivetrain.DrivetrainConstants.RightEncoderSourceA;
-import static frc.robot.drivetrain.DrivetrainConstants.RightEncoderSourceB;
-import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
-import static frc.robot.drivetrain.DrivetrainConstants.leftEncoderSourceA;
-import static frc.robot.drivetrain.DrivetrainConstants.leftEncoderSourceB;
-import static frc.robot.drivetrain.DrivetrainConstants.moveD;
-import static frc.robot.drivetrain.DrivetrainConstants.moveI;
-import static frc.robot.drivetrain.DrivetrainConstants.moveP;
+import static frc.robot.drivetrain.DrivetrainConstants.*;
 
 /**
  * The Drivetrain Subsystem.
@@ -41,7 +33,6 @@ public class Drivetrain extends SubsystemBase {
     private final DifferentialDrive DiffDrive = new DifferentialDrive(leftLeader, rightLeader);
 
     // Instantiates encoders
-    @SuppressWarnings("unused")
     private final Encoder leftEncoder = new Encoder(leftEncoderSourceA, leftEncoderSourceB);
     private final Encoder rightEncoder = new Encoder(RightEncoderSourceA, RightEncoderSourceB);
 
@@ -92,9 +83,21 @@ public class Drivetrain extends SubsystemBase {
         return currEncoderValue - prevEncoderValue;
     }
 
-    public void updateRobotPosition() {
-        double orientation = 0;
-        
+    public void updateRobotPosition(double encoderValue, boolean isRotating) {
+        Rotation2d rotation = new Rotation2d();
+        Translation2d translation = new Translation2d();
+        Transform2d transform;
+        if (isRotating) {
+            rotation = new Rotation2d(encoderValue / (TURNING_RADIUS * 2 * Math.PI / 360));
+        }
+        if (!isRotating) {
+            double xComp = Vision.Robot.getRotation().getCos() * encoderValue;
+            double yComp = Vision.Robot.getRotation().getSin() * encoderValue;
+            translation = new Translation2d(xComp, yComp);
+        }
+
+        transform = new Transform2d(translation, rotation);
+        Vision.Robot.transformBy(transform);
     }
 
     /**
@@ -103,10 +106,9 @@ public class Drivetrain extends SubsystemBase {
      * @param distance distance to drive the robot.
      * @return voltage of the motors.
      */
-    public void drive(Measure<Distance> distance) { // i forgot that you could simply access the voltage of the motor
-                                                    // directley...
+    public void drive(Measure<Distance> distance) {
         double voltage;
-        double encoderValue = Math.abs(rightEncoder.get());
+        double encoderValue = Math.abs(rightEncoder.getDistance());
         voltage = pidControllerTranslation.calculate(encoderValue, distance.in(Meters));
 
         if (Math.abs(voltage) > 1) {
@@ -115,6 +117,8 @@ public class Drivetrain extends SubsystemBase {
 
         leftLeader.set(voltage);
         rightLeader.set(voltage);
+
+        updateRobotPosition(encoderValue, false);
     }
 
     /**
@@ -125,7 +129,7 @@ public class Drivetrain extends SubsystemBase {
     public void rotate(Measure<Angle> angle) {
         double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
 
-        double encoderValue = Math.abs(rightEncoder.get());
+        double encoderValue = Math.abs(rightEncoder.getDistance());
         double voltage = pidControllerRotation.calculate(encoderValue / 2, distance);
 
         if (Math.abs(voltage) > 1) {
@@ -134,6 +138,8 @@ public class Drivetrain extends SubsystemBase {
 
         leftLeader.setVoltage(-voltage);
         rightLeader.setVoltage(voltage);
+
+        updateRobotPosition(encoderValue, true);
     }
 
     /**
@@ -145,7 +151,7 @@ public class Drivetrain extends SubsystemBase {
     public void rotate(Measure<Angle> angle, boolean negate) {
         double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
 
-        double encoderValue = Math.abs(rightEncoder.get());
+        double encoderValue = Math.abs(rightEncoder.getDistance());
         double voltage = pidControllerRotation.calculate(encoderValue / 2, distance);
 
         if (Math.abs(voltage) > 1) {
@@ -159,6 +165,7 @@ public class Drivetrain extends SubsystemBase {
             rightLeader.setVoltage(voltage);
         }
 
+        updateRobotPosition(encoderValue, true);
     }
 
     /**
