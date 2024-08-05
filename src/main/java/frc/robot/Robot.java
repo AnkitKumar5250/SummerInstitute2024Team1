@@ -4,6 +4,14 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.math.MathShared;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -54,6 +62,7 @@ public class Robot extends CommandRobot {
     if (elevator.getBeamBreak()) {
       Shoot();
     }
+
   }
 
   @Override
@@ -94,23 +103,37 @@ public class Robot extends CommandRobot {
         .finallyDo(() -> drivetrain.rotateDegreesCommand(Positioning.calcAngleTowardsBank(), true));
   }
 
-  private Command MoveCommand() {
-    // unfinished
-    return Commands.run(() -> MoveCommand());
+  private Command MoveCommand(Measure<Distance> x, Measure<Distance> y) {
+    Measure<Distance> distance = Meters.of(Math.hypot(x.in(Meters), y.in(Meters)));
+    return drivetrain.rotateTowardsPositionCommand(x, y).finallyDo(() -> drivetrain.driveDistanceCommand(distance));
   }
 
-  @SuppressWarnings("unused")
+  private Command RotateCommand(Measure<Angle> angle) {
+    return drivetrain.rotateToAngleCommand(angle);
+  }
+
+
+
+  /**
+   * Prepares the intake.
+   */
   private void Intake() {
     CommandScheduler.getInstance().schedule(IntakeCommand());
   }
 
+  /**
+   * Launches the ball at the goal.
+   */
   private void Shoot() {
     CommandScheduler.getInstance().schedule(ShootCommand());
   }
 
-  @SuppressWarnings("unused")
-  private void Move() {
-    CommandScheduler.getInstance().schedule(MoveCommand());
+  /**
+   * Moves the robot to a certain position on the field.
+   * @param translation : translation representing target location.
+   */
+  private void Move(Translation2d translation) {
+    CommandScheduler.getInstance().schedule(MoveCommand(Meters.of(translation.getX()),Meters.of(translation.getY())));
   }
 
 }

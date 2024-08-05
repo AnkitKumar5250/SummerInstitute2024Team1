@@ -47,6 +47,10 @@ public final class Constants {
 
     public static final Translation2d BANK_POSITION = new Translation2d(Inches.of(132), Inches.of(90));
 
+    public static final Translation2d BALL_ONE_POSITION = new Translation2d(Inches.of(0), Inches.of(0));
+    public static final Translation2d BALL_TWO_POSITION = new Translation2d(Inches.of(0), Inches.of(0));
+    public static final Translation2d BALL_THREE_POSITION = new Translation2d(Inches.of(0), Inches.of(0));
+
     public static final Measure<Distance> FIELD_LENGTH = Inches.of(312);
     public static final Measure<Distance> FIELD_WIDTH = Inches.of(180);
 

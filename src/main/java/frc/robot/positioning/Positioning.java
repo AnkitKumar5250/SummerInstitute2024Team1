@@ -18,6 +18,7 @@ import frc.robot.Constants.FieldConstants;
  */
 public class Positioning {
     public static Pose2d robot = new Pose2d(Meters.of(0), Meters.of(0), new Rotation2d(Degrees.of(0)));
+    
 
     /**
      * Calculates the relative angle between the robot's current position and the
@@ -28,7 +29,7 @@ public class Positioning {
      * @return The angle.
      */
     public static Measure<Angle> calcAngleTowardsBank() {
-        return Degrees.of(Math.atan(FieldConstants.BANK_POSITION.getX() - robot.getX() / 156 - robot.getY()));
+        return Degrees.of(Math.atan(FieldConstants.BANK_POSITION.getX() - robot.getX() / 156 - robot.getY())).minus(Positioning.getOrientation());
     }
 
     /**
@@ -42,9 +43,18 @@ public class Positioning {
      * @return The angle.
      */
     public static Measure<Angle> calcAngleTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
-        return Degrees.of(Math.atan(x.in(Meters) - robot.getX() / y.in(Meters) - robot.getY()));
+        return Degrees.of(Math.atan(x.in(Meters) - robot.getX() / y.in(Meters) - robot.getY())).minus(Positioning.getOrientation());
     }
 
+    public static Measure<Angle> getOrientation() {
+        return Degrees.of(Positioning.robot.getRotation().getDegrees() % 360);
+    }
+
+    /**
+     * Updates the robot pose based on drivetrain input.
+     * @param encoderValue : Measure of the encoders.
+     * @param isRotating : If the robot is rotating or not.
+     */
     public static void updateRobotPosition(double encoderValue, boolean isRotating) {
         Rotation2d rotation = new Rotation2d();
         Translation2d translation = new Translation2d();

@@ -4,7 +4,6 @@ import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -34,8 +33,6 @@ public class Drivetrain extends SubsystemBase {
 
     // Instantiates Differential Drive
     private final DifferentialDrive diffDrive = new DifferentialDrive(leftLeader, rightLeader);
-
-    
 
     // Instantiates encoders
     private final Encoder leftEncoder = new Encoder(leftEncoderSourceA, leftEncoderSourceB);
@@ -195,6 +192,21 @@ public class Drivetrain extends SubsystemBase {
         return Commands.run(() -> rotate(angle))
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
+
+     /**
+     * Rotates to a certain absolute angle.
+     *
+     * @param angle  : angle to rotate to.
+     * @return A command.
+     */
+    public Command rotateToAngleCommand(Measure<Angle> angle) {
+        leftEncoder.reset();
+        rightEncoder.reset();
+
+        return Commands.run(() -> rotate(angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees()))))
+                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+    }
+
 
     /**
      * Faces robot towards bank.
