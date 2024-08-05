@@ -79,7 +79,7 @@ public class Robot extends CommandRobot {
    */
   private Command IntakeCommand() {
     return intake.extend()
-        .alongWith(intake.runIntake())
+        .alongWith(intake.startIntake())
         .alongWith(elevator.elevatorBrake())
         .finallyDo(() -> intake.retract());
   }

@@ -13,12 +13,8 @@ import frc.robot.Constants.FieldConstants;
  * This is utility class designed to aid in accurately positioning the robot.
  */
 public class Vision {
-    public static class Robot {
-        public static Pose2d POSITION = new Pose2d(Meters.of(0), Meters.of(0), new Rotation2d(Degrees.of(0)));
-        public static Pose2d ORIENTATION = new Pose2d(Meters.of(0), Meters.of(0), new Rotation2d(Degrees.of(0)));
-    }
-   
-    
+    public static Pose2d Robot = new Pose2d(Meters.of(0), Meters.of(0), new Rotation2d(Degrees.of(0)));
+
     /**
      * Calculates the relative angle between the robot's current position and the
      * bank.
@@ -28,7 +24,7 @@ public class Vision {
      * @return The angle.
      */
     public static Measure<Angle> calcAngleTowardsBank() {
-        return Degrees.of(Math.atan(FieldConstants.BANK_POSITION.getX() - Robot.POSITION.getX()/ 156 - Robot.ORIENTATION.getY()));
+        return Degrees.of(Math.atan(FieldConstants.BANK_POSITION.getX() - Robot.getX() / 156 - Robot.getY()));
     }
 
     /**
@@ -42,6 +38,6 @@ public class Vision {
      * @return The angle.
      */
     public static Measure<Angle> calcAngleTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
-        return Degrees.of(Math.atan(x.in(Meters) - Robot.POSITION.getX() / y.in(Meters) - Robot.POSITION.getY()));
+        return Degrees.of(Math.atan(x.in(Meters) - Robot.getX() / y.in(Meters) - Robot.getY()));
     }
 }

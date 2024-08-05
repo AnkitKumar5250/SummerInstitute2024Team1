@@ -7,7 +7,6 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
@@ -42,8 +41,8 @@ public class Shooter extends SubsystemBase {
      * @return The power that the ball needs to be launched at.
      */
     public double calcVelocity() {
-        Measure<Distance> xDifference = Meter.of(Math.abs(Vision.Robot.POSITION.getX() - TARGET.getX()));
-        Measure<Distance> yDifference = Meters.of(Math.abs(Vision.Robot.POSITION.getX() - TARGET.getX()));
+        Measure<Distance> xDifference = Meter.of(Math.abs(Vision.Robot.getX() - TARGET.getX()));
+        Measure<Distance> yDifference = Meters.of(Math.abs(Vision.Robot.getX() - TARGET.getX()));
 
         double hDistance = Math.hypot(xDifference.in(Meters), yDifference.in(Meters));
         double vDistance = TARGET.getZ() - SHOOTER_HEIGHT;
