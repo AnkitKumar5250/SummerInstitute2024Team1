@@ -61,8 +61,7 @@ public class Positioning {
         Transform2d transform;
         if (isRotating) {
             rotation = new Rotation2d(encoderValue / (TURNING_RADIUS * 2 * Math.PI / 360));
-        }
-        if (!isRotating) {
+        } else {
             double xComp = robot.getRotation().getCos() * encoderValue;
             double yComp = robot.getRotation().getSin() * encoderValue;
             translation = new Translation2d(xComp, yComp);
