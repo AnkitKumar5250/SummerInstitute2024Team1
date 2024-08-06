@@ -13,7 +13,6 @@ import frc.robot.intake.Intake;
 import frc.robot.shooter.Shooter;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.Constants.FieldConstants.*;
 
@@ -52,13 +51,10 @@ public class Robot extends CommandRobot {
   public void autonomousInit() {
     Actions.Intake();
     Actions.Move(BALL_ONE_POSITION);
-    Actions.RotateTo(Degrees.of(180));
     Actions.Shoot();
     Actions.Move(BALL_TWO_POSITION);
-    Actions.RotateTo(Degrees.of(90));
     Actions.Shoot();
     Actions.Move(BALL_THREE_POSITION);
-    Actions.RotateTo(Degrees.of(90));
     Actions.Shoot();
     // This should cause the robot to shoot after picking up each ball, then move to the autoscore positions
 
@@ -67,7 +63,6 @@ public class Robot extends CommandRobot {
     Actions.Drive(Meters.of(12));
     Actions.Shoot();
     Actions.Move(AUTO_SCORE_POS_2);
-    Actions.RotateTo(Degrees.of(270));
     Actions.Shoot();
   }
 
