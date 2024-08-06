@@ -35,7 +35,7 @@ public class Intake extends SubsystemBase {
      */
     public Command extend() {
         return runOnce(
-                () -> pivot.set(intakePID.calculate(pivot.get(), stopPoint)));
+                () -> pivot.setVoltage(intakePID.calculate(pivot.get(), stopPoint)));
     }
 
     // Retracts until the original point
@@ -45,7 +45,7 @@ public class Intake extends SubsystemBase {
      */
     public Command retract() {
         return runOnce(
-                () -> pivot.set(intakePID.calculate(pivot.get(), startPoint)));
+                () -> pivot.setVoltage(intakePID.calculate(pivot.get(), startPoint)));
 
     }
 
