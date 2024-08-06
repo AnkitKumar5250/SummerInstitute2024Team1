@@ -55,7 +55,7 @@ public class Shooter extends SubsystemBase {
      * Constructor.
      */
     public Shooter() {
-
+        motor.setInverted(true);
     }
 
     /**
