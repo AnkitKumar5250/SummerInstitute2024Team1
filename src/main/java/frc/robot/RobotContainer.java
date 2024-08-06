@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 
@@ -15,13 +15,13 @@ import frc.robot.intake.Intake;
 import frc.robot.positioning.Positioning;
 import frc.robot.shooter.Shooter;
 
-public class CommandContainer {
+public class RobotContainer {
     private Intake intake = new Intake();
     private Elevator elevator = new Elevator();
     private Shooter shooter = new Shooter();
     private Drivetrain drivetrain = new Drivetrain();
 
-    public CommandContainer(Intake intake, Elevator elevator, Shooter shooter, Drivetrain drivetrain) {
+    public RobotContainer(Intake intake, Elevator elevator, Shooter shooter, Drivetrain drivetrain) {
         this.intake = intake;
         this.elevator = elevator;
         this.shooter = shooter;
@@ -29,12 +29,16 @@ public class CommandContainer {
     }
 
 
-    public void configureBindings(CommandXboxController operator) {
+    /**
+     * Configures the button bindings.
+     * @param operator : Xbox controller.
+     */
+    public void configureButtonBindings(CommandXboxController operator) {
         operator.a().whileTrue(IntakeCommand());
     }
 
     /**
-     * Command to prepare the intake
+     * Command to prepare the intake.
      */
     private Command IntakeCommand() {
         return intake.extend()
@@ -44,7 +48,7 @@ public class CommandContainer {
     }
 
     /**
-     * Command to prepare the shooter
+     * Command to prepare the shooter.
      */
     private Command ShootCommand() {
         return drivetrain
