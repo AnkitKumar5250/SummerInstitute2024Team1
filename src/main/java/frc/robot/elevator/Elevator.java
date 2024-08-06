@@ -10,9 +10,11 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Ports.Elevator.*;
+import static frc.robot.Ports.Elevator.elevatorPort;
 import static frc.robot.Ports.Intake.beamBreakEntrancePort;
-import static frc.robot.elevator.ElevatorConstants.*;
+import static frc.robot.elevator.ElevatorConstants.elevatorD;
+import static frc.robot.elevator.ElevatorConstants.elevatorI;
+import static frc.robot.elevator.ElevatorConstants.elevatorP;
 
 public class Elevator extends SubsystemBase {
     boolean elevated = false;
@@ -34,8 +36,8 @@ public class Elevator extends SubsystemBase {
     public Command elevatorBrake() {
         if (beamBreak.get() == true) {
             return run(
-                    () -> elevator.set(elevatorPID.calculate(elevator.get(), 1))).finallyDo(
-                            () -> elevator.set(elevatorPID.calculate(elevator.get(), 0)));
+                    () -> elevator.setVoltage(elevatorPID.calculate(elevator.get(), .25))).finallyDo(
+                            () -> elevator.setVoltage(elevatorPID.calculate(elevator.get(), 0)));
         }
         return Commands.none();
     }

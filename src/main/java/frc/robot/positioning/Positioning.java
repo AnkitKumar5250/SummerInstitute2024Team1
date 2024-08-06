@@ -9,9 +9,8 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
-
 import frc.robot.Constants.FieldConstants;
+import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
 
 /**
  * This is utility class designed to aid in accurately positioning the robot.
@@ -47,7 +46,7 @@ public class Positioning {
     }
 
     public static Measure<Angle> getOrientation() {
-        return Degrees.of(Positioning.robot.getRotation().getDegrees() % 360);
+        return Degrees.of(robot.getRotation().getDegrees() % 360);
     }
 
     /**
