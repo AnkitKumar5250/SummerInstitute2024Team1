@@ -32,8 +32,6 @@ public class Intake extends SubsystemBase {
         pivotEncoder = pivot.getAbsoluteEncoder();
     }
 
-    // Add PID to all three of these methods pls
-    // Extends until a certain "angle" is reached
     /**
      * method that extends the pivot
      *
@@ -44,7 +42,6 @@ public class Intake extends SubsystemBase {
                 () -> pivot.setVoltage(intakePID.calculate(pivotEncoder.getPosition() * 360, stopPoint)));
     }
 
-    // Retracts until the original point
     /**
      * method that retracts the pivot
      *
@@ -56,7 +53,6 @@ public class Intake extends SubsystemBase {
 
     }
 
-    // Starts the intake
     /**
      * command that starts rollers and ends them
      *

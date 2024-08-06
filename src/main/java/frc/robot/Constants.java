@@ -32,13 +32,10 @@ public final class Constants {
 
   public static class FieldConstants {
     // 0,0 is at the center
-
     // -90,156 is at the top left
     // 90,156 is at the top right
-
     // -90, -156 is at the bottom left
     // 90, -156 is at the bottom right
-
     // positive Y is up the field
     // positive X is to the right
 
