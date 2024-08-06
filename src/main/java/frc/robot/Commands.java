@@ -67,7 +67,7 @@ public class Commands {
      */
     private Command MoveCommand(Measure<Distance> x, Measure<Distance> y) {
         Measure<Distance> distance = Meters.of(Math.hypot(x.in(Meters), y.in(Meters)));
-        return drivetrain.rotateTowardsPositionCommand(x, y).finallyDo(() -> drivetrain.driveDistanceCommand(distance));
+        return drivetrain.rotateTowardsPosition(x, y).finallyDo(() -> drivetrain.driveDistanceCommand(distance));
     }
 
     /**
@@ -77,7 +77,7 @@ public class Commands {
      * @return A command.
      */
     private Command RotateCommand(Measure<Angle> angle) {
-        return drivetrain.rotateToAngleCommand(angle);
+        return drivetrain.rotateToAngle(angle);
     }
 
     /**
@@ -105,7 +105,7 @@ public class Commands {
     }
 
     public void Drive(Measure<Distance> distance) {
-        CommandScheduler.getInstance().schedule(drivetrain.driveDistanceCommand(distance));
+        CommandScheduler.getInstance().schedule(drivetrain.driveDistance(distance));
     }
 
      /**

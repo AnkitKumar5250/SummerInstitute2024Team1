@@ -156,7 +156,7 @@ public class Drivetrain extends SubsystemBase {
      * @param meters : distance to drive.
      * @return A command.
      */
-    public Command driveDistanceCommand(Measure<Distance> distance) {
+    public Command driveDistance(Measure<Distance> distance) {
         leftEncoder.reset();
         rightEncoder.reset();
 
@@ -167,25 +167,11 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Rotates a certain angle.
      *
-     * @param angle : angle to rotate.
-     * @return A command.
-     */
-    public Command rotateDegreesCommand(Measure<Angle> angle) {
-        leftEncoder.reset();
-        rightEncoder.reset();
-
-        return Commands.run(() -> rotate(angle))
-                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
-    }
-
-    /**
-     * Rotates a certain angle.
-     *
      * @param angle  : angle to rotate.
      * @param negate : whether to rotate clockwise or not.
      * @return A command.
      */
-    public Command rotateDegreesCommand(Measure<Angle> angle, boolean negate) {
+    public Command rotateDegrees(Measure<Angle> angle, boolean negate) {
         leftEncoder.reset();
         rightEncoder.reset();
 
@@ -199,7 +185,7 @@ public class Drivetrain extends SubsystemBase {
      * @param angle  : angle to rotate to.
      * @return A command.
      */
-    public Command rotateToAngleCommand(Measure<Angle> angle) {
+    public Command rotateToAngle(Measure<Angle> angle) {
         leftEncoder.reset();
         rightEncoder.reset();
 
@@ -212,7 +198,7 @@ public class Drivetrain extends SubsystemBase {
      * Faces robot towards bank.
      * 
      */
-    public Command rotateTowardsBankCommand() {
+    public Command rotateTowardsBank() {
         leftEncoder.reset();
         rightEncoder.reset();
 
@@ -226,7 +212,7 @@ public class Drivetrain extends SubsystemBase {
      * @param x : refrence point X.
      * @param y : refrence point Y.
      */
-    public Command rotateTowardsPositionCommand(Measure<Distance> x, Measure<Distance> y) {
+    public Command rotateTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
         leftEncoder.reset();
         rightEncoder.reset();
 
