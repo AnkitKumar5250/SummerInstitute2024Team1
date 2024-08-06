@@ -14,6 +14,8 @@ public final class ShooterConstants {
     public static final double kI = 0;
     public static final double kD = 0;
 
+    public static final long SHOOT_TIME = 1000L;
+
     public static final Measure<Angle> LAUNCH_ANGLE = Degrees.of(60); //convert angle from degrees to radians (if in degrees)
     public static final Measure<Distance> SHOOTER_HEIGHT = Meters.of(0); // input height please
 }

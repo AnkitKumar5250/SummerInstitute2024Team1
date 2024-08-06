@@ -13,6 +13,7 @@ import frc.robot.elevator.Elevator;
 import frc.robot.intake.Intake;
 import frc.robot.positioning.Positioning;
 import frc.robot.shooter.Shooter;
+import frc.robot.shooter.ShooterConstants;
 
 public class Commands {
     private Intake intake = new Intake();
@@ -27,20 +28,22 @@ public class Commands {
         this.drivetrain = drivetrain;
     }
 
-
     /**
      * Configures the button bindings.
+     * 
      * @param operator : Xbox controller.
      */
     public void configureButtonBindings(CommandXboxController operator) {
-        operator.a().whileTrue(IntakeCommand());
-        operator.b().onTrue(ShootCommand());
+        operator.a().whileTrue(runIntake());
+        operator.b().onTrue(shoot());
     }
 
     /**
      * Command to prepare the intake.
+     * 
+     * @return A command.
      */
-    public Command IntakeCommand() {
+    public Command runIntake() {
         return intake.extend()
                 .alongWith(intake.startIntake())
                 .alongWith(elevator.elevatorBrake())
@@ -48,13 +51,36 @@ public class Commands {
     }
 
     /**
-     * Command to prepare the shooter.
+     * Command to launch the ball.
+     * 
+     * @return A command.
      */
-    public Command ShootCommand() {
+    public Command shoot() {
         return drivetrain
                 .rotateTowardsBank()
                 .alongWith(shooter.setVelocity())
-                .finallyDo(() -> drivetrain.rotateDegrees(Positioning.calcAngleTowardsBank(), true));
+                .finallyDo(() -> drivetrain.rotateDegrees(Positioning.calcAngleTowardsBank(), true)
+                        .alongWith(shooter.turnOff()));
+    }
+
+    /**
+     * Drives a certain distance.
+     * 
+     * @param distance : distance to drive.
+     * @return A command.
+     */
+    public Command drive(Measure<Distance> distance) {
+        return drivetrain.drive(distance);
+    }
+
+    /**
+     * Turns the robot to a certain orientation.
+     * 
+     * @param angle : angle to rotate to.
+     * @return A command.
+     */
+    public Command rotate(Measure<Angle> angle) {
+        return drivetrain.rotateToAngle(angle);
     }
 
     /**
@@ -64,39 +90,19 @@ public class Commands {
      * @param y : y coordinate of target location.
      * @return A command.
      */
-    public Command MoveCommand(Measure<Distance> x, Measure<Distance> y) {
+    public Command moveTo(Measure<Distance> x, Measure<Distance> y) {
         Measure<Distance> distance = Meters.of(Math.hypot(x.in(Meters), y.in(Meters)));
-        return drivetrain.rotateTowardsPosition(x, y).finallyDo(() -> drivetrain.driveDistance(distance));
+        return drivetrain.rotateTowardsPosition(x, y).finallyDo(() -> drivetrain.drive(distance));
     }
 
-    /**
-     * Turns the robot to a certain orientation.
-     * 
-     * @param angle : angle to rotate to.
-     * @return A command.
-     */
-    private Command RotateCommand(Measure<Angle> angle) {
-        return drivetrain.rotateToAngle(angle);
-    }
     /**
      * Moves the robot to a certain position on the field.
      * 
      * @param translation : translation representing target location.
+     * @return A command.
      */
-    public Command MoveTranslationCommand(Translation2d translation) {
-        return MoveCommand(Meters.of(translation.getX()), Meters.of(translation.getY()));
+    public Command moveTo(Translation2d translation) {
+        return moveTo(Meters.of(translation.getX()), Meters.of(translation.getY()));
     }
 
-    public Command DriveCommand(Measure<Distance> distance) {
-        return drivetrain.driveDistance(distance);
-    }
-
-     /**
-     * Turns the robot to a certain orientation.
-     * 
-     * @param angle : angle to rotate to.
-     */
-    public void RotateTo(Measure<Angle> angle) {
-        RotateCommand(angle);
-    }
 }

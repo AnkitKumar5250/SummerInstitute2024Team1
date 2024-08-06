@@ -70,93 +70,14 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Updates voltage based on driver input.
-     * 
-     * @param leftSpeed  : Y-axis of left joystick.
-     * @param rightSpeed : Y-axis of right joystick.
-     * @return A command.
-     */
-    public void tankDrive(double leftSpeed, double rightSpeed) {
-        diffDrive.tankDrive(leftSpeed, -rightSpeed);
-    }
-
-    /**
-     * Updates voltage based on PID in order to drive a certain distance.
-     * 
-     * @param distance distance to drive the robot.
-     * @return voltage of the motors.
-     */
-    public void drive(Measure<Distance> distance) {
-        double voltage;
-        double encoderValue = Math.abs(rightEncoder.getDistance());
-        voltage = pidControllerTranslation.calculate(encoderValue, distance.in(Meters));
-
-        if (Math.abs(voltage) > 1) {
-            voltage = Math.copySign(1, voltage);
-        }
-
-        leftLeader.set(voltage);
-        rightLeader.set(voltage);
-
-        Positioning.updateRobotPosition(encoderValue, false);
-    }
-
-    /**
-     * Updates voltage based on PID in order to fufill rotation command.
-     * 
-     * @param angle : angle to rotate.
-     */
-    public void rotate(Measure<Angle> angle) {
-        double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
-
-        double encoderValue = Math.abs(rightEncoder.getDistance());
-        double voltage = pidControllerRotation.calculate(encoderValue, distance);
-
-        if (Math.abs(voltage) > 1) {
-            voltage = Math.copySign(1, voltage);
-        }
-
-        leftLeader.setVoltage(-voltage);
-        rightLeader.setVoltage(voltage);
-
-        Positioning.updateRobotPosition(encoderValue, true);
-    }
-
-    /**
-     * Updates voltage based on PID in order to fufill rotation command.
-     * 
-     * @param negate : whether to rotate the opposite direction(clockwise) or not.
-     * @param angle  : angle to rotate.
-     */
-    public void rotate(Measure<Angle> angle, boolean negate) {
-        double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
-
-        double encoderValue = Math.abs(rightEncoder.getDistance());
-        double voltage = pidControllerRotation.calculate(encoderValue, distance);
-
-        if (Math.abs(voltage) > 1) {
-            voltage = Math.copySign(1, voltage);
-        }
-        if (negate) {
-            leftLeader.setVoltage(voltage);
-            rightLeader.setVoltage(-voltage);
-        } else {
-            leftLeader.setVoltage(-voltage);
-            rightLeader.setVoltage(voltage);
-        }
-
-        Positioning.updateRobotPosition(encoderValue, true);
-    }
-
-    /**
      * Drives based on driver input.
      * 
      * @param leftSpeed  Y-axis of left joystick.
      * @param rightSpeed X-axis of right joystick.
      * @return A command.
      */
-    public Command driveCommand(double leftSpeed, double rightSpeed) {
-        return Commands.run(() -> tankDrive(leftSpeed, rightSpeed));
+    public Command drive(double leftSpeed, double rightSpeed) {
+        return Commands.run(() -> diffDrive.tankDrive(leftSpeed, -rightSpeed));
     }
 
     /**
@@ -165,16 +86,28 @@ public class Drivetrain extends SubsystemBase {
      * @param meters : distance to drive.
      * @return A command.
      */
-    public Command driveDistance(Measure<Distance> distance) {
+    public Command drive(Measure<Distance> distance) {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() -> drive(distance))
-                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+        return Commands.run(() -> {
+            double voltage;
+            double encoderValue = Math.abs(rightEncoder.getDistance());
+            voltage = pidControllerTranslation.calculate(encoderValue, distance.in(Meters));
+
+            if (Math.abs(voltage) > 1) {
+                voltage = Math.copySign(1, voltage);
+            }
+
+            leftLeader.set(voltage);
+            rightLeader.set(voltage);
+
+            Positioning.updateRobotPosition(encoderValue, false);
+        }).until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
     /**
-     * Rotates a certain angle.
+     * Rotates a certain angle counterclockwise.
      *
      * @param angle  : angle to rotate.
      * @param negate : whether to rotate clockwise or not.
@@ -184,24 +117,84 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() -> rotate(angle))
+        return Commands.run(() -> {
+            double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
+
+            double encoderValue = Math.abs(rightEncoder.getDistance());
+            double voltage = pidControllerRotation.calculate(encoderValue, distance);
+
+            if (Math.abs(voltage) > 1) {
+                voltage = Math.copySign(1, voltage);
+            }
+            if (negate) {
+                leftLeader.setVoltage(voltage);
+                rightLeader.setVoltage(-voltage);
+            } else {
+                leftLeader.setVoltage(-voltage);
+                rightLeader.setVoltage(voltage);
+            }
+
+            Positioning.updateRobotPosition(encoderValue, true);
+        })
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
-     /**
+      /**
+     * Rotates a certain angle counterclockwise.
+     *
+     * @param angle  : angle to rotate.
+     * @return A command.
+     */
+    public Command rotateDegrees(Measure<Angle> angle) {
+        leftEncoder.reset();
+        rightEncoder.reset();
+
+        return Commands.run(() -> {
+            double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
+
+            double encoderValue = Math.abs(rightEncoder.getDistance());
+            double voltage = pidControllerRotation.calculate(encoderValue, distance);
+
+            if (Math.abs(voltage) > 1) {
+                voltage = Math.copySign(1, voltage);
+            }
+
+            leftLeader.setVoltage(-voltage);
+            rightLeader.setVoltage(voltage);
+
+            Positioning.updateRobotPosition(encoderValue, true);
+        })
+                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+    }
+
+    /**
      * Rotates to a certain absolute angle.
      *
-     * @param angle  : angle to rotate to.
+     * @param angle : angle to rotate to.
      * @return A command.
      */
     public Command rotateToAngle(Measure<Angle> angle) {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() -> rotate(angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees()))))
+        return Commands.run(() -> {
+            double distance = angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees())).in(Degrees)
+                    * TURNING_RADIUS * 2 * Math.PI / 360;
+
+            double encoderValue = Math.abs(rightEncoder.getDistance());
+            double voltage = pidControllerRotation.calculate(encoderValue, distance);
+
+            if (Math.abs(voltage) > 1) {
+                voltage = Math.copySign(1, voltage);
+            }
+
+            leftLeader.setVoltage(-voltage);
+            rightLeader.setVoltage(voltage);
+
+            Positioning.updateRobotPosition(encoderValue, true);
+        })
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
-
 
     /**
      * Faces robot towards bank.
@@ -211,7 +204,24 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() ->  rotate(Positioning.calcAngleTowardsBank()))
+        return Commands.run(() -> {
+            double distance = Positioning.calcAngleTowardsBank().in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
+
+            double encoderValue = Math.abs(rightEncoder.getDistance());
+            double voltage = pidControllerRotation.calculate(encoderValue, distance);
+
+            if (Math.abs(voltage) > 1) {
+                voltage = Math.copySign(1, voltage);
+            }
+
+            leftLeader.setVoltage(voltage);
+            rightLeader.setVoltage(-voltage);
+
+            leftLeader.setVoltage(-voltage);
+            rightLeader.setVoltage(voltage);
+
+            Positioning.updateRobotPosition(encoderValue, true);
+        })
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
@@ -225,7 +235,25 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() ->  rotate(Positioning.calcAngleTowardsPosition(x, y)))
+        return Commands.run(() -> {
+            double distance = Positioning.calcAngleTowardsPosition(x, y).in(Degrees) * TURNING_RADIUS * 2 * Math.PI
+                    / 360;
+
+            double encoderValue = Math.abs(rightEncoder.getDistance());
+            double voltage = pidControllerRotation.calculate(encoderValue, distance);
+
+            if (Math.abs(voltage) > 1) {
+                voltage = Math.copySign(1, voltage);
+            }
+
+            leftLeader.setVoltage(voltage);
+            rightLeader.setVoltage(-voltage);
+
+            leftLeader.setVoltage(-voltage);
+            rightLeader.setVoltage(voltage);
+
+            Positioning.updateRobotPosition(encoderValue, true);
+        })
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 

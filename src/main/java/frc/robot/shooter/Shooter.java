@@ -44,7 +44,8 @@ public class Shooter extends SubsystemBase {
         Measure<Distance> hDistance = Meters.of(Math.hypot(xDifference.in(Meters), yDifference.in(Meters)));
         Measure<Distance> vDistance = Meters.of(TARGET.getZ() - SHOOTER_HEIGHT.in(Meters));
 
-        double velocity = Math.sqrt((G * Math.pow(hDistance.in(Meters), 2) * Math.pow(1 / Math.cos(LAUNCH_ANGLE.in(Degrees)), 2))
+        double velocity = Math
+                .sqrt((G * Math.pow(hDistance.in(Meters), 2) * Math.pow(1 / Math.cos(LAUNCH_ANGLE.in(Degrees)), 2))
                         / (2 * (Math.tan(LAUNCH_ANGLE.in(Degrees)) * hDistance.in(Meters) - vDistance.in(Meters))));
         velocity *= POWER_COEFFICIENT;
         return velocity;
@@ -57,20 +58,22 @@ public class Shooter extends SubsystemBase {
         motor.setInverted(true);
     }
 
-    /**
-     * Turns off the motor.
-     */
-    public Command turnOff() {
-        return runOnce(() -> motor.stopMotor());
-    }
 
     /**
      * Returns the velocity of the motor in RPM.
      * 
      * @return The velocity of the motor.
      */
-    public double getVelocity() {
+    private double getVelocity() {
         return encoder.getVelocity();
+    }
+
+    
+    /**
+     * Turns off the motor.
+     */
+    public Command turnOff() {
+        return runOnce(() -> motor.stopMotor());
     }
 
     /**
@@ -87,16 +90,7 @@ public class Shooter extends SubsystemBase {
      * Sets the velocity of the motor appropriate for scoring.
      */
     public Command setVelocity() {
-        return run(() -> updateVelocity()).until(() -> motor.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+        return run(() -> motor.setVoltage(pid.calculate(getVelocity(), calcVelocity())))
+                .until(() -> motor.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
-
-    /**
-     * Updates the velocity of the motor based on PID in order to score.
-     */
-    public double updateVelocity() {
-        double voltage = pid.calculate(getVelocity(), calcVelocity());
-        motor.setVoltage(voltage);
-        return voltage;
-    }
-
 }
