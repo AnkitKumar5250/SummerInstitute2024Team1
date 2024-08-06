@@ -35,6 +35,7 @@ public class Commands {
      */
     public void configureButtonBindings(CommandXboxController operator) {
         operator.a().whileTrue(IntakeCommand());
+        operator.b().onTrue(ShootCommand());
     }
 
     /**
