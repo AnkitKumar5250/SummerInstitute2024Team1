@@ -49,8 +49,15 @@ public class Robot extends CommandRobot {
   @Override
   public void autonomousInit() {
     Actions.Move(BALL_ONE_POSITION);
+    Actions.RotateTo(Degrees.of(180));
+    Actions.Shoot();
     Actions.Move(BALL_TWO_POSITION);
+    Actions.RotateTo(Degrees.of(90));
+    Actions.Shoot();
     Actions.Move(BALL_THREE_POSITION);
+    Actions.RotateTo(Degrees.of(90));
+    Actions.Shoot();
+    // This should cause the robot to shoot after picking up each ball, then move to the autoscore positions
 
     Actions.Move(AUTO_SCORE_POS_1);
     Actions.RotateTo(Degrees.of(90));

@@ -39,13 +39,12 @@ public class Shooter extends SubsystemBase {
      */
     public double calcVelocity() {
         Measure<Distance> xDifference = Meter.of(Math.abs(Positioning.robot.getX() - TARGET.getX()));
-        Measure<Distance> yDifference = Meters.of(Math.abs(Positioning.robot.getX() - TARGET.getX()));
+        Measure<Distance> yDifference = Meters.of(Math.abs(Positioning.robot.getY() - TARGET.getY()));
 
         Measure<Distance> hDistance = Meters.of(Math.hypot(xDifference.in(Meters), yDifference.in(Meters)));
         Measure<Distance> vDistance = Meters.of(TARGET.getZ() - SHOOTER_HEIGHT.in(Meters));
 
-        double velocity = Math
-                .sqrt((G * Math.pow(hDistance.in(Meters), 2) * Math.pow(1 / Math.cos(LAUNCH_ANGLE.in(Degrees)), 2))
+        double velocity = Math.sqrt((G * Math.pow(hDistance.in(Meters), 2) * Math.pow(1 / Math.cos(LAUNCH_ANGLE.in(Degrees)), 2))
                         / (2 * (Math.tan(LAUNCH_ANGLE.in(Degrees)) * hDistance.in(Meters) - vDistance.in(Meters))));
         velocity *= POWER_COEFFICIENT;
         return velocity;
