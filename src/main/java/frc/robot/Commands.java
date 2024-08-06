@@ -38,7 +38,7 @@ public class Commands {
      * @param operator : Xbox controller.
      */
     public void configureButtonBindings(CommandXboxController operator) {
-        operator.a().whileTrue(runIntake());
+        operator.a().whileTrue(Intake());
         operator.b().onTrue(shoot());
         drivetrain.setDefaultCommand(drivetrain.drive(operator.getLeftY(), operator.getRightY()));
     }
@@ -48,11 +48,11 @@ public class Commands {
      * 
      * @return A command.
      */
-    public Command runIntake() {
+    public Command Intake() {
         return intake.extend()
-                .alongWith(intake.startIntake())
-                .alongWith(elevator.runElevator())
-                .finallyDo(() -> intake.retract());
+                .alongWith(intake.start())
+                .alongWith(elevator.start())
+                .finallyDo(() -> intake.retract().alongWith(intake.stop()));
     }
 
     /**

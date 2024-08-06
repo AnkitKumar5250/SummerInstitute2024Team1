@@ -9,12 +9,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.Ports.Intake.pivotPort;
 import static frc.robot.Ports.Intake.rollerPort;
 import static frc.robot.intake.IntakeConstants.D;
 import static frc.robot.intake.IntakeConstants.I;
 import static frc.robot.intake.IntakeConstants.P;
 import static frc.robot.intake.IntakeConstants.RETRACTED_ANGLE;
+import static frc.robot.intake.IntakeConstants.TARGET_VELOCITY;
 import static frc.robot.intake.IntakeConstants.EXTENDED_ANGLE;
 
 public class Intake extends SubsystemBase {
@@ -59,14 +61,24 @@ public class Intake extends SubsystemBase {
     }
 
     /**
-     * Command that starts rollers and ends them
+     * Starts the rollers.
      *
-     * @return command that starts rollers and eventually ends them
+     * @return A command.
      */
-    public Command startIntake() {
+    public Command start() {
         return run(
-                () -> roller.set(1)).finallyDo(
-                        () -> roller.set(0));
+                () -> roller.set(
+                        pidController.calculate(rollerEncoder.getVelocity(), TARGET_VELOCITY.in(MetersPerSecond))));
+    }
+
+    /**
+     * Stops the rollers.
+     *
+     * @return A command.
+     */
+    public Command stop() {
+        return runOnce(
+                () -> roller.set(0));
     }
 
 }

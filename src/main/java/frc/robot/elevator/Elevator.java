@@ -18,13 +18,13 @@ import static frc.robot.elevator.ElevatorConstants.I;
 
 public class Elevator extends SubsystemBase {
     // Instantiates motor
-    private final CANSparkMax elevator = new CANSparkMax(elevatorPort, MotorType.kBrushless);
+    private final CANSparkMax motor = new CANSparkMax(elevatorPort, MotorType.kBrushless);
 
-    // Instantiates beambrake
+    // Instantiates beambreak
     private final DigitalInput beamBreak = new DigitalInput(beamBreakEntrancePort);
 
     // Instantiates PID Controller
-    private final PIDController elevatorPID = new PIDController(P, I, D);
+    private final PIDController PID = new PIDController(P, I, D);
 
     /**
      * Constructor
@@ -34,7 +34,7 @@ public class Elevator extends SubsystemBase {
     }
 
     /**
-     * Returns the reading of the beambrake
+     * Returns the reading of the beambreak
      */
     public boolean getBeamBreak() {
         return this.beamBreak.get();
@@ -45,11 +45,20 @@ public class Elevator extends SubsystemBase {
      * 
      * @return A command.
      */
-    public Command runElevator() {
+    public Command start() {
         return run(
-                () -> elevator
-                        .setVoltage(elevatorPID.calculate(elevator.get(), ElevatorConstants.TARGET_VOLTAGE.in(Volts))))
-                .finallyDo(
-                        () -> elevator.setVoltage(elevatorPID.calculate(elevator.get(), 0)));
+                () -> motor
+                        .setVoltage(PID.calculate(motor.get(), ElevatorConstants.TARGET_VOLTAGE.in(Volts))));
+    }
+
+    /**
+     * Stops elevator.
+     * 
+     * @return A command.
+     */
+    public Command stop() {
+        return runOnce(
+                () -> motor
+                        .setVoltage(0));
     }
 }
