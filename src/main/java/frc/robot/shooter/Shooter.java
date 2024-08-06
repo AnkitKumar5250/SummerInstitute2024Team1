@@ -41,8 +41,8 @@ public class Shooter extends SubsystemBase {
         Measure<Distance> xDifference = Meter.of(Math.abs(Positioning.robot.getX() - TARGET.getX()));
         Measure<Distance> yDifference = Meters.of(Math.abs(Positioning.robot.getY() - TARGET.getY()));
 
-        Measure<Distance> hDistance = Meters.of(Math.hypot(xDifference.in(Meters), yDifference.in(Meters)));
-        Measure<Distance> vDistance = Meters.of(TARGET.getZ() - SHOOTER_HEIGHT.in(Meters));
+        Measure<Distance> hDistance = Meters.of(Math.hypot(xDifference.in(Meters), yDifference.in(Meters))); // hypotenuse distance
+        Measure<Distance> vDistance = Meters.of(TARGET.getZ() - SHOOTER_HEIGHT.in(Meters)); // height difference
 
         double velocity = Math
                 .sqrt((G.in(MetersPerSecond) * Math.pow(hDistance.in(Meters), 2)
@@ -57,7 +57,7 @@ public class Shooter extends SubsystemBase {
      */
     public Shooter() {
         motor.setInverted(true);
-    }
+    } // inverted motor(testing motor resulted in ball launched opposite direction)
 
     /**
      * Returns the velocity of the motor in RPM.
