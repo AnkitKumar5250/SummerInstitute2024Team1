@@ -47,7 +47,7 @@ public class Robot extends CommandRobot {
   public void autonomousInit() {
     // This should cause the robot to shoot after picking up each ball, then move to
     // the autoscore positions
-    robot.runIntake();
+    robot.intake();
     robot.driveTo(BALL_ONE_POSITION).andThen(robot.shoot());
     robot.driveTo(BALL_TWO_POSITION).andThen(robot.shoot());
     robot.driveTo(BALL_THREE_POSITION).andThen(robot.shoot());

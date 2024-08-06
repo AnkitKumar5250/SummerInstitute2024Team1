@@ -16,10 +16,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
-import static frc.robot.Ports.Drive.RightEncoderSourceA;
-import static frc.robot.Ports.Drive.RightEncoderSourceB;
-import static frc.robot.Ports.Drive.RightFollowerID;
-import static frc.robot.Ports.Drive.RightLeaderID;
+import static frc.robot.Ports.Drive.rightEncoderSourceA;
+import static frc.robot.Ports.Drive.rightEncoderSourceB;
+import static frc.robot.Ports.Drive.rightFollowerID;
+import static frc.robot.Ports.Drive.rightLeaderID;
 import static frc.robot.Ports.Drive.leftEncoderSourceA;
 import static frc.robot.Ports.Drive.leftEncoderSourceB;
 import static frc.robot.Ports.Drive.leftFollowerID;
@@ -37,15 +37,15 @@ public class Drivetrain extends SubsystemBase {
     // Instantiates motors
     private final CANSparkMax leftLeader = new CANSparkMax(leftLeaderID, kBrushless);
     private final CANSparkMax leftFollower = new CANSparkMax(leftFollowerID, kBrushless);
-    private final CANSparkMax rightLeader = new CANSparkMax(RightLeaderID, kBrushless);
-    private final CANSparkMax rightFollower = new CANSparkMax(RightFollowerID, kBrushless);
+    private final CANSparkMax rightLeader = new CANSparkMax(rightLeaderID, kBrushless);
+    private final CANSparkMax rightFollower = new CANSparkMax(rightFollowerID, kBrushless);
 
     // Instantiates Differential Drive
     private final DifferentialDrive diffDrive = new DifferentialDrive(leftLeader, rightLeader);
 
     // Instantiates encoders
     private final Encoder leftEncoder = new Encoder(leftEncoderSourceA, leftEncoderSourceB);
-    private final Encoder rightEncoder = new Encoder(RightEncoderSourceA, RightEncoderSourceB);
+    private final Encoder rightEncoder = new Encoder(rightEncoderSourceA, rightEncoderSourceB);
 
     // Instantiates PID controllers
     private final PIDController pidControllerTranslation = new PIDController(P, I, D);
