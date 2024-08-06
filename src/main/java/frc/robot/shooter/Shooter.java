@@ -7,17 +7,19 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.Velocity;
-
-import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.positioning.Positioning;
-
 import static frc.robot.Constants.FieldConstants.G;
 import static frc.robot.Constants.FieldConstants.TARGET;
 import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
 import static frc.robot.Ports.Shooter.motorPort;
+import frc.robot.positioning.Positioning;
 import static frc.robot.shooter.ShooterConstants.LAUNCH_ANGLE;
 import static frc.robot.shooter.ShooterConstants.POWER_COEFFICIENT;
 import static frc.robot.shooter.ShooterConstants.SHOOTER_HEIGHT;
@@ -26,13 +28,8 @@ import static frc.robot.shooter.ShooterConstants.kI;
 import static frc.robot.shooter.ShooterConstants.kP;
 
 public class Shooter extends SubsystemBase {
-    // Instantiate motor
     private final CANSparkMax motor = new CANSparkMax(motorPort, MotorType.kBrushless);
-
-    // Instantiate encoder
     private final RelativeEncoder encoder = motor.getEncoder();
-
-    // Instantiate PID Controller
     private final PIDController pid = new PIDController(kP, kI, kD);
 
     /**

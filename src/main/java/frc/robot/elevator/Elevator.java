@@ -1,7 +1,5 @@
 package frc.robot.elevator;
 
-import java.util.function.BooleanSupplier;
-
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
@@ -18,7 +16,6 @@ import static frc.robot.elevator.ElevatorConstants.elevatorP;
 
 public class Elevator extends SubsystemBase {
     boolean elevated = false;
-    BooleanSupplier isElevated = () -> elevated;
 
     CANSparkMax elevator = new CANSparkMax(elevatorPort, MotorType.kBrushless);
     DigitalInput beamBreak = new DigitalInput(beamBreakEntrancePort);
@@ -41,19 +38,4 @@ public class Elevator extends SubsystemBase {
         }
         return Commands.none();
     }
-
-//     // Starts the elevator
-//     public Command toggleElevation() {
-//         return runOnce(
-//                 () -> {
-//                     if (isElevated.getAsBoolean()) {
-//                         elevator.set(0);
-//                         elevated = false;
-//                     } else {
-//                         elevator.set(1);
-//                         elevated = true;
-//                     }
-//                 });
-//     }
-
  }
