@@ -15,11 +15,20 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Ports.Drive.*;
-import frc.robot.positioning.Positioning;
-
 import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
-import static frc.robot.drivetrain.DrivetrainConstants.*;
+import static frc.robot.Ports.Drive.RightEncoderSourceA;
+import static frc.robot.Ports.Drive.RightEncoderSourceB;
+import static frc.robot.Ports.Drive.RightFollowerID;
+import static frc.robot.Ports.Drive.RightLeaderID;
+import static frc.robot.Ports.Drive.leftEncoderSourceA;
+import static frc.robot.Ports.Drive.leftEncoderSourceB;
+import static frc.robot.Ports.Drive.leftFollowerID;
+import static frc.robot.Ports.Drive.leftLeaderID;
+import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
+import static frc.robot.drivetrain.DrivetrainConstants.moveD;
+import static frc.robot.drivetrain.DrivetrainConstants.moveI;
+import static frc.robot.drivetrain.DrivetrainConstants.moveP;
+import frc.robot.positioning.Positioning;
 
 /**
  * The Drivetrain Subsystem.
@@ -64,7 +73,7 @@ public class Drivetrain extends SubsystemBase {
      * Updates voltage based on driver input.
      * 
      * @param leftSpeed  : Y-axis of left joystick.
-     * @param rightSpeed : X-axis of right joystick.
+     * @param rightSpeed : Y-axis of right joystick.
      * @return A command.
      */
     public void tankDrive(double leftSpeed, double rightSpeed) {

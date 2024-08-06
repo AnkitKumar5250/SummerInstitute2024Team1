@@ -1,7 +1,5 @@
 package frc.robot.intake;
 
-import java.util.function.BooleanSupplier;
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -19,8 +17,6 @@ import static frc.robot.intake.IntakeConstants.stopPoint;
 
 public class Intake extends SubsystemBase {
 
-    boolean extended = false;
-    BooleanSupplier isExtended = () -> extended;
     AbsoluteEncoder pivotEncoder;
 
     CANSparkMax roller = new CANSparkMax(rollerPort, MotorType.kBrushless);
