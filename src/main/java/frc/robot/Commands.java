@@ -33,14 +33,14 @@ public class Commands {
      * @param operator : Xbox controller.
      */
     public void configureButtonBindings(CommandXboxController operator) {
-        operator.a().whileTrue(IntakeCommand());
-        operator.b().onTrue(ShootCommand());
+        operator.a().whileTrue(Intake());
+        operator.b().onTrue(Shoot());
     }
 
     /**
      * Command to prepare the intake.
      */
-    public Command IntakeCommand() {
+    public Command Intake() {
         return intake.extend()
                 .alongWith(intake.startIntake())
                 .alongWith(elevator.elevatorBrake())
@@ -50,7 +50,7 @@ public class Commands {
     /**
      * Command to prepare the shooter.
      */
-    public Command ShootCommand() {
+    public Command Shoot() {
         return drivetrain
                 .rotateTowardsBank()
                 .alongWith(shooter.setVelocity())
@@ -64,7 +64,7 @@ public class Commands {
      * @param y : y coordinate of target location.
      * @return A command.
      */
-    public Command MoveCommand(Measure<Distance> x, Measure<Distance> y) {
+    public Command Move(Measure<Distance> x, Measure<Distance> y) {
         Measure<Distance> distance = Meters.of(Math.hypot(x.in(Meters), y.in(Meters)));
         return drivetrain.rotateTowardsPosition(x, y).finallyDo(() -> drivetrain.driveDistance(distance));
     }
@@ -75,7 +75,7 @@ public class Commands {
      * @param angle : angle to rotate to.
      * @return A command.
      */
-    private Command RotateCommand(Measure<Angle> angle) {
+    private Command Rotate(Measure<Angle> angle) {
         return drivetrain.rotateToAngle(angle);
     }
     /**
@@ -83,11 +83,11 @@ public class Commands {
      * 
      * @param translation : translation representing target location.
      */
-    public Command MoveTranslationCommand(Translation2d translation) {
+    public Command MoveTranslation(Translation2d translation) {
         return MoveCommand(Meters.of(translation.getX()), Meters.of(translation.getY()));
     }
 
-    public Command DriveCommand(Measure<Distance> distance) {
+    public Command Drive(Measure<Distance> distance) {
         return drivetrain.driveDistance(distance);
     }
 
