@@ -103,6 +103,10 @@ public class Commands {
                 .schedule(MoveCommand(Meters.of(translation.getX()), Meters.of(translation.getY())));
     }
 
+    public void Drive(Measure<Distance> distance) {
+        CommandScheduler.getInstance().schedule(drivetrain.driveDistanceCommand(distance));
+    }
+
      /**
      * Turns the robot to a certain orientation.
      * 

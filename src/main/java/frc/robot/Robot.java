@@ -13,6 +13,8 @@ import frc.robot.intake.Intake;
 import frc.robot.shooter.Shooter;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.Constants.FieldConstants.*;
 
 /**
@@ -48,6 +50,7 @@ public class Robot extends CommandRobot {
   /** This function is called once each time the robot enters autonomous mode. */
   @Override
   public void autonomousInit() {
+    Actions.Intake();
     Actions.Move(BALL_ONE_POSITION);
     Actions.RotateTo(Degrees.of(180));
     Actions.Shoot();
@@ -61,8 +64,11 @@ public class Robot extends CommandRobot {
 
     Actions.Move(AUTO_SCORE_POS_1);
     Actions.RotateTo(Degrees.of(90));
+    Actions.Drive(Meters.of(12));
+    Actions.Shoot();
     Actions.Move(AUTO_SCORE_POS_2);
     Actions.RotateTo(Degrees.of(270));
+    Actions.Shoot();
   }
 
   /** This function is called periodically during autonomous. */
