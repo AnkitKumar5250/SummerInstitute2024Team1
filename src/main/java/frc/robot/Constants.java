@@ -51,6 +51,9 @@ public final class Constants {
     public static final Measure<Distance> FIELD_LENGTH = Inches.of(312);
     public static final Measure<Distance> FIELD_WIDTH = Inches.of(180); 
 
+    public static final Translation2d AUTO_SCORE_POS_1 = new Translation2d(Inches.of(126), Inches.of(-10));
+    public static final Translation2d AUTO_SCORE_POS_2 = new Translation2d(Inches.of(90), Inches.of(-10));
+
     // dimensions of field
 
     public static final Measure<Distance> HUMAN_PLAYER_ZONE_LENGTH = Inches.of(24);

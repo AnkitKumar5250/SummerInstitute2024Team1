@@ -15,13 +15,13 @@ import frc.robot.intake.Intake;
 import frc.robot.positioning.Positioning;
 import frc.robot.shooter.Shooter;
 
-public class RobotContainer {
+public class Commands {
     private Intake intake = new Intake();
     private Elevator elevator = new Elevator();
     private Shooter shooter = new Shooter();
     private Drivetrain drivetrain = new Drivetrain();
 
-    public RobotContainer(Intake intake, Elevator elevator, Shooter shooter, Drivetrain drivetrain) {
+    public Commands(Intake intake, Elevator elevator, Shooter shooter, Drivetrain drivetrain) {
         this.intake = intake;
         this.elevator = elevator;
         this.shooter = shooter;
@@ -35,6 +35,7 @@ public class RobotContainer {
      */
     public void configureButtonBindings(CommandXboxController operator) {
         operator.a().whileTrue(IntakeCommand());
+        operator.b().onTrue(ShootCommand());
     }
 
     /**
@@ -66,7 +67,7 @@ public class RobotContainer {
      */
     private Command MoveCommand(Measure<Distance> x, Measure<Distance> y) {
         Measure<Distance> distance = Meters.of(Math.hypot(x.in(Meters), y.in(Meters)));
-        return drivetrain.rotateTowardsPositionCommand(x, y).finallyDo(() -> drivetrain.driveDistanceCommand(distance));
+        return drivetrain.rotateTowardsPosition(x, y).finallyDo(() -> drivetrain.driveDistanceCommand(distance));
     }
 
     /**
@@ -76,7 +77,7 @@ public class RobotContainer {
      * @return A command.
      */
     private Command RotateCommand(Measure<Angle> angle) {
-        return drivetrain.rotateToAngleCommand(angle);
+        return drivetrain.rotateToAngle(angle);
     }
 
     /**
@@ -101,6 +102,10 @@ public class RobotContainer {
     public void Move(Translation2d translation) {
         CommandScheduler.getInstance()
                 .schedule(MoveCommand(Meters.of(translation.getX()), Meters.of(translation.getY())));
+    }
+
+    public void Drive(Measure<Distance> distance) {
+        CommandScheduler.getInstance().schedule(drivetrain.driveDistance(distance));
     }
 
      /**
