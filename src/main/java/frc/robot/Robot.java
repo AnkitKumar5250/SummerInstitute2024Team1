@@ -49,21 +49,21 @@ public class Robot extends CommandRobot {
   /** This function is called once each time the robot enters autonomous mode. */
   @Override
   public void autonomousInit() {
-    Actions.Intake();
-    Actions.Move(BALL_ONE_POSITION);
-    Actions.Shoot();
-    Actions.Move(BALL_TWO_POSITION);
-    Actions.Shoot();
-    Actions.Move(BALL_THREE_POSITION);
-    Actions.Shoot();
+    Actions.IntakeCommand();
+    Actions.MoveTranslationCommand(BALL_ONE_POSITION);
+    Actions.ShootCommand();
+    Actions.MoveTranslationCommand(BALL_TWO_POSITION);
+    Actions.ShootCommand();
+    Actions.MoveTranslationCommand(BALL_THREE_POSITION);
+    Actions.ShootCommand();
     // This should cause the robot to shoot after picking up each ball, then move to the autoscore positions
 
-    Actions.Move(AUTO_SCORE_POS_1);
+    Actions.MoveTranslationCommand(AUTO_SCORE_POS_1);
     Actions.RotateTo(Degrees.of(90));
-    Actions.Drive(Meters.of(12));
-    Actions.Shoot();
-    Actions.Move(AUTO_SCORE_POS_2);
-    Actions.Shoot();
+    Actions.DriveCommand(Meters.of(12));
+    Actions.ShootCommand();
+    Actions.MoveTranslationCommand(AUTO_SCORE_POS_2);
+    Actions.ShootCommand();
   }
 
   /** This function is called periodically during autonomous. */
@@ -71,7 +71,7 @@ public class Robot extends CommandRobot {
   public void autonomousPeriodic() {
     // Runs shoot command when beambrake is triggered
     if (elevator.getBeamBreak()) {
-      Actions.Shoot();
+      Actions.ShootCommand();
     }
 
   }
@@ -88,7 +88,7 @@ public class Robot extends CommandRobot {
   @Override
   public void teleopPeriodic() {
     if (elevator.getBeamBreak()) {
-      Actions.Shoot();
+      Actions.ShootCommand();
     }
   }
 

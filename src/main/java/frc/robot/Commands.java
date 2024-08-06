@@ -41,7 +41,7 @@ public class Commands {
     /**
      * Command to prepare the intake.
      */
-    private Command IntakeCommand() {
+    public Command IntakeCommand() {
         return intake.extend()
                 .alongWith(intake.startIntake())
                 .alongWith(elevator.elevatorBrake())
@@ -51,11 +51,11 @@ public class Commands {
     /**
      * Command to prepare the shooter.
      */
-    private Command ShootCommand() {
+    public Command ShootCommand() {
         return drivetrain
-                .rotateTowardsBankCommand()
+                .rotateTowardsBank()
                 .alongWith(shooter.setVelocity())
-                .finallyDo(() -> drivetrain.rotateDegreesCommand(Positioning.calcAngleTowardsBank(), true));
+                .finallyDo(() -> drivetrain.rotateDegrees(Positioning.calcAngleTowardsBank(), true));
     }
 
     /**
@@ -65,9 +65,9 @@ public class Commands {
      * @param y : y coordinate of target location.
      * @return A command.
      */
-    private Command MoveCommand(Measure<Distance> x, Measure<Distance> y) {
+    public Command MoveCommand(Measure<Distance> x, Measure<Distance> y) {
         Measure<Distance> distance = Meters.of(Math.hypot(x.in(Meters), y.in(Meters)));
-        return drivetrain.rotateTowardsPosition(x, y).finallyDo(() -> drivetrain.driveDistanceCommand(distance));
+        return drivetrain.rotateTowardsPosition(x, y).finallyDo(() -> drivetrain.driveDistance(distance));
     }
 
     /**
@@ -79,33 +79,17 @@ public class Commands {
     private Command RotateCommand(Measure<Angle> angle) {
         return drivetrain.rotateToAngle(angle);
     }
-
-    /**
-     * Prepares the intake.
-     */
-    public void Intake() {
-        CommandScheduler.getInstance().schedule(IntakeCommand());
-    }
-
-    /**
-     * Launches the ball at the goal.
-     */
-    public void Shoot() {
-        CommandScheduler.getInstance().schedule(ShootCommand());
-    }
-
     /**
      * Moves the robot to a certain position on the field.
      * 
      * @param translation : translation representing target location.
      */
-    public void Move(Translation2d translation) {
-        CommandScheduler.getInstance()
-                .schedule(MoveCommand(Meters.of(translation.getX()), Meters.of(translation.getY())));
+    public Command MoveTranslationCommand(Translation2d translation) {
+        return MoveCommand(Meters.of(translation.getX()), Meters.of(translation.getY()));
     }
 
-    public void Drive(Measure<Distance> distance) {
-        CommandScheduler.getInstance().schedule(drivetrain.driveDistance(distance));
+    public Command DriveCommand(Measure<Distance> distance) {
+        return drivetrain.driveDistance(distance);
     }
 
      /**
