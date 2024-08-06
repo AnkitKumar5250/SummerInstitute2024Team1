@@ -8,33 +8,48 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Ports.Elevator.elevatorPort;
 import static frc.robot.Ports.Intake.beamBreakEntrancePort;
-import static frc.robot.elevator.ElevatorConstants.elevatorD;
-import static frc.robot.elevator.ElevatorConstants.elevatorI;
-import static frc.robot.elevator.ElevatorConstants.elevatorP;
+import static frc.robot.elevator.ElevatorConstants.P;
+import static frc.robot.elevator.ElevatorConstants.D;
+import static frc.robot.elevator.ElevatorConstants.I;
 
 public class Elevator extends SubsystemBase {
+    // Instantiates motor
+    private final CANSparkMax elevator = new CANSparkMax(elevatorPort, MotorType.kBrushless);
 
-    CANSparkMax elevator = new CANSparkMax(elevatorPort, MotorType.kBrushless);
-    DigitalInput beamBreak = new DigitalInput(beamBreakEntrancePort);
+    // Instantiates beambrake
+    private final DigitalInput beamBreak = new DigitalInput(beamBreakEntrancePort);
 
-    private final PIDController elevatorPID = new PIDController(elevatorP, elevatorI, elevatorD);
+    // Instantiates PID Controller
+    private final PIDController elevatorPID = new PIDController(P, I, D);
 
+    /**
+     * Constructor
+     */
+    public Elevator() {
+
+    }
+
+    /**
+     * Returns the reading of the beambrake
+     */
     public boolean getBeamBreak() {
         return this.beamBreak.get();
     }
 
     /**
-     * Detects whether beambreak is triggered or not and runs the elevator accordingly 
-     * @return command to run elevator 
+     * Runs elevator.
+     * 
+     * @return A command.
      */
-    public Command elevatorBrake() {
-        if (beamBreak.get() == true) {
-            return run(
-                    () -> elevator.setVoltage(elevatorPID.calculate(elevator.get(), .25))).finallyDo(
-                            () -> elevator.setVoltage(elevatorPID.calculate(elevator.get(), 0)));
-        }
-        return Commands.none();
+    public Command runElevator() {
+        return run(
+                () -> elevator
+                        .setVoltage(elevatorPID.calculate(elevator.get(), ElevatorConstants.TARGET_VOLTAGE.in(Volts))))
+                .finallyDo(
+                        () -> elevator.setVoltage(elevatorPID.calculate(elevator.get(), 0)));
     }
- }
+}

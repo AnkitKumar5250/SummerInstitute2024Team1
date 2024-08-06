@@ -2,12 +2,12 @@ package frc.robot;
 
 public final class Ports {
     public static final class Shooter {
-        public static final int motorPort = 0; 
+        public static final int motorPort = 0;
     }
 
     public static final class Intake {
         public static final int beamBreakEntrancePort = 0;
-        public static final int rollerPort = 0; 
+        public static final int rollerPort = 0;
         public static final int pivotPort = 0;
     }
 
@@ -26,8 +26,9 @@ public final class Ports {
         public static final int leftFollowerID = 0;
         public static final int RightFollowerID = 0;
     }
+
     public static class OperatorConstants {
         public static final int driverControllerPort = 0;
         public static final int OperatorControllerPort = 0;
-      }
+    }
 }

@@ -15,7 +15,7 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.FieldConstants.G;
+import static frc.robot.Constants.G;
 import static frc.robot.Constants.FieldConstants.TARGET;
 import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
 import static frc.robot.Ports.Shooter.motorPort;
@@ -45,7 +45,8 @@ public class Shooter extends SubsystemBase {
         Measure<Distance> vDistance = Meters.of(TARGET.getZ() - SHOOTER_HEIGHT.in(Meters));
 
         double velocity = Math
-                .sqrt((G * Math.pow(hDistance.in(Meters), 2) * Math.pow(1 / Math.cos(LAUNCH_ANGLE.in(Degrees)), 2))
+                .sqrt((G.in(MetersPerSecond) * Math.pow(hDistance.in(Meters), 2)
+                        * Math.pow(1 / Math.cos(LAUNCH_ANGLE.in(Degrees)), 2))
                         / (2 * (Math.tan(LAUNCH_ANGLE.in(Degrees)) * hDistance.in(Meters) - vDistance.in(Meters))));
         velocity *= POWER_COEFFICIENT;
         return velocity;
@@ -58,7 +59,6 @@ public class Shooter extends SubsystemBase {
         motor.setInverted(true);
     }
 
-
     /**
      * Returns the velocity of the motor in RPM.
      * 
@@ -68,7 +68,6 @@ public class Shooter extends SubsystemBase {
         return encoder.getVelocity();
     }
 
-    
     /**
      * Turns off the motor.
      */

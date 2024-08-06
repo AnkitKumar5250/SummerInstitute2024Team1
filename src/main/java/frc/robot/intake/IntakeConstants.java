@@ -1,10 +1,20 @@
 package frc.robot.intake;
 
+import static edu.wpi.first.units.Units.Degrees;
+
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+
 public class IntakeConstants {
-    // encoder constants for extend() and retract() respectively
-    public static final double stopPoint = 90; 
-    public static final double startPoint = 0;
-    public static final double intakeP = 0;
-    public static final double intakeI = 0;
-    public static final double intakeD = 0;
+    // PID constants
+    public static final double P = 0;
+    public static final double I = 0;
+    public static final double D = 0;
+
+    // Angles at which the intake is lowered/raised
+    public static final Measure<Angle> EXTENDED_ANGLE = Degrees.of(90);
+    public static final Measure<Angle> RETRACTED_ANGLE = Degrees.of(0);
+
+    
+   
 }

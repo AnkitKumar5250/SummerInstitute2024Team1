@@ -25,9 +25,9 @@ import static frc.robot.Ports.Drive.leftEncoderSourceB;
 import static frc.robot.Ports.Drive.leftFollowerID;
 import static frc.robot.Ports.Drive.leftLeaderID;
 import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
-import static frc.robot.drivetrain.DrivetrainConstants.moveD;
-import static frc.robot.drivetrain.DrivetrainConstants.moveI;
-import static frc.robot.drivetrain.DrivetrainConstants.moveP;
+import static frc.robot.drivetrain.DrivetrainConstants.D;
+import static frc.robot.drivetrain.DrivetrainConstants.I;
+import static frc.robot.drivetrain.DrivetrainConstants.P;
 import frc.robot.positioning.Positioning;
 
 /**
@@ -48,8 +48,7 @@ public class Drivetrain extends SubsystemBase {
     private final Encoder rightEncoder = new Encoder(RightEncoderSourceA, RightEncoderSourceB);
 
     // Instantiates PID controllers
-    private final PIDController pidControllerRotation = new PIDController(1, 0, 1);
-    private final PIDController pidControllerTranslation = new PIDController(moveP, moveI, moveD);
+    private final PIDController pidControllerTranslation = new PIDController(P, I, D);
 
     /**
      * Constructor.
@@ -118,10 +117,10 @@ public class Drivetrain extends SubsystemBase {
         rightEncoder.reset();
 
         return Commands.run(() -> {
-            double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
+            double distance = angle.in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            double voltage = pidControllerRotation.calculate(encoderValue, distance);
+            double voltage = pidControllerTranslation.calculate(encoderValue, distance);
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
@@ -139,10 +138,10 @@ public class Drivetrain extends SubsystemBase {
                 .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
     }
 
-      /**
+    /**
      * Rotates a certain angle counterclockwise.
      *
-     * @param angle  : angle to rotate.
+     * @param angle : angle to rotate.
      * @return A command.
      */
     public Command rotateDegrees(Measure<Angle> angle) {
@@ -150,10 +149,10 @@ public class Drivetrain extends SubsystemBase {
         rightEncoder.reset();
 
         return Commands.run(() -> {
-            double distance = angle.in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
+            double distance = angle.in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            double voltage = pidControllerRotation.calculate(encoderValue, distance);
+            double voltage = pidControllerTranslation.calculate(encoderValue, distance);
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
@@ -179,10 +178,10 @@ public class Drivetrain extends SubsystemBase {
 
         return Commands.run(() -> {
             double distance = angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees())).in(Degrees)
-                    * TURNING_RADIUS * 2 * Math.PI / 360;
+                    * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            double voltage = pidControllerRotation.calculate(encoderValue, distance);
+            double voltage = pidControllerTranslation.calculate(encoderValue, distance);
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
@@ -205,10 +204,11 @@ public class Drivetrain extends SubsystemBase {
         rightEncoder.reset();
 
         return Commands.run(() -> {
-            double distance = Positioning.calcAngleTowardsBank().in(Degrees) * TURNING_RADIUS * 2 * Math.PI / 360;
+            double distance = Positioning.calcAngleTowardsBank().in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI
+                    / 360;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            double voltage = pidControllerRotation.calculate(encoderValue, distance);
+            double voltage = pidControllerTranslation.calculate(encoderValue, distance);
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
@@ -236,11 +236,12 @@ public class Drivetrain extends SubsystemBase {
         rightEncoder.reset();
 
         return Commands.run(() -> {
-            double distance = Positioning.calcAngleTowardsPosition(x, y).in(Degrees) * TURNING_RADIUS * 2 * Math.PI
+            double distance = Positioning.calcAngleTowardsPosition(x, y).in(Degrees) * TURNING_RADIUS.in(Meters) * 2
+                    * Math.PI
                     / 360;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            double voltage = pidControllerRotation.calculate(encoderValue, distance);
+            double voltage = pidControllerTranslation.calculate(encoderValue, distance);
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
