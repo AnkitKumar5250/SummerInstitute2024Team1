@@ -15,7 +15,6 @@ import static frc.robot.elevator.ElevatorConstants.elevatorI;
 import static frc.robot.elevator.ElevatorConstants.elevatorP;
 
 public class Elevator extends SubsystemBase {
-    boolean elevated = false;
 
     CANSparkMax elevator = new CANSparkMax(elevatorPort, MotorType.kBrushless);
     DigitalInput beamBreak = new DigitalInput(beamBreakEntrancePort);
