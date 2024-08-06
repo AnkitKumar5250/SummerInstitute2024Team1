@@ -12,6 +12,9 @@ import frc.robot.elevator.Elevator;
 import frc.robot.intake.Intake;
 import frc.robot.shooter.Shooter;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static frc.robot.Constants.FieldConstants.*;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
@@ -27,11 +30,10 @@ public class Robot extends CommandRobot {
   private static final Shooter shooter = new Shooter();
   private static final Drivetrain drivetrain = new Drivetrain();
 
-  private static final RobotContainer Actions = new RobotContainer(intake,elevator,shooter,drivetrain);
+  private static final Commands Actions = new Commands(intake, elevator, shooter, drivetrain);
 
   private static final CommandXboxController driver = new CommandXboxController(
       Ports.OperatorConstants.driverControllerPort);
-  @SuppressWarnings("unused")
   private static final CommandXboxController operator = new CommandXboxController(
       Ports.OperatorConstants.OperatorControllerPort);
 
@@ -46,7 +48,14 @@ public class Robot extends CommandRobot {
   /** This function is called once each time the robot enters autonomous mode. */
   @Override
   public void autonomousInit() {
+    Actions.Move(BALL_ONE_POSITION);
+    Actions.Move(BALL_TWO_POSITION);
+    Actions.Move(BALL_THREE_POSITION);
 
+    Actions.Move(AUTO_SCORE_POS_1);
+    Actions.RotateTo(Degrees.of(90));
+    Actions.Move(AUTO_SCORE_POS_2);
+    Actions.RotateTo(Degrees.of(270));
   }
 
   /** This function is called periodically during autonomous. */

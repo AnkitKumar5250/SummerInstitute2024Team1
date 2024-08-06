@@ -15,13 +15,13 @@ import frc.robot.intake.Intake;
 import frc.robot.positioning.Positioning;
 import frc.robot.shooter.Shooter;
 
-public class RobotContainer {
+public class Commands {
     private Intake intake = new Intake();
     private Elevator elevator = new Elevator();
     private Shooter shooter = new Shooter();
     private Drivetrain drivetrain = new Drivetrain();
 
-    public RobotContainer(Intake intake, Elevator elevator, Shooter shooter, Drivetrain drivetrain) {
+    public Commands(Intake intake, Elevator elevator, Shooter shooter, Drivetrain drivetrain) {
         this.intake = intake;
         this.elevator = elevator;
         this.shooter = shooter;
