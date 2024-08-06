@@ -1,9 +1,5 @@
 package frc.robot.intake;
 
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import static edu.wpi.first.units.Units.Degrees;
-
 public class IntakeConstants {
     // encoder constants for extend() and retract() respectively
     public static final double stopPoint = 90; 
