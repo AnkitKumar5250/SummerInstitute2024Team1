@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.CommandRobot;
-import frc.robot.commands.CommandContainer;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.elevator.Elevator;
 import frc.robot.intake.Intake;
@@ -28,7 +27,7 @@ public class Robot extends CommandRobot {
   private static final Shooter shooter = new Shooter();
   private static final Drivetrain drivetrain = new Drivetrain();
 
-  private static final CommandContainer Actions = new CommandContainer(intake,elevator,shooter,drivetrain);
+  private static final RobotContainer Actions = new RobotContainer(intake,elevator,shooter,drivetrain);
 
   private static final CommandXboxController driver = new CommandXboxController(
       Ports.OperatorConstants.driverControllerPort);
@@ -64,7 +63,7 @@ public class Robot extends CommandRobot {
   public void teleopInit() {
     // Cancels all autonomous commands at the beggining of telop
     CommandScheduler.getInstance().cancelAll();
-    Actions.configureBindings(operator);
+    Actions.configureButtonBindings(operator);
     drivetrain.setDefaultCommand(drivetrain.driveCommand(driver.getLeftY(), driver.getRightY()));
   }
 
