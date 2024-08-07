@@ -40,8 +40,8 @@ public class Commands {
      * @param operator : Xbox controller.
      */
     public void configureButtonBindings() {
-        operator.a().whileTrue(intake());
-        operator.b().onTrue(shoot());
+        operator.rightBumper().whileTrue(intake());
+        operator.leftBumper().onTrue(shoot());
         drivetrain.setDefaultCommand(drivetrain.drive(operator.getLeftY(), operator.getRightY()));
     }
 
