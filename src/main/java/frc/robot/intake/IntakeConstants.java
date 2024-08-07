@@ -1,17 +1,15 @@
 package frc.robot.intake;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 
+/** Constants for the Intake Subsystem. */
 public class IntakeConstants {
-    // PID constants for pivot
+    /** PID constants for roller */
     public static final class PivotPID {
         public static final double P = 0; // proportional
         public static final double I = 0; // integral
@@ -21,7 +19,7 @@ public class IntakeConstants {
         public static final Measure<Angle> ANGLE_TOLERANCE = Degrees.of(0);
     }
 
-    // PID constants for roller
+    /** PID constants for roller */
     public static final class PivotFFD {
         public static final double S = 0; // static gain
         public static final double V = 0; // velocity gain

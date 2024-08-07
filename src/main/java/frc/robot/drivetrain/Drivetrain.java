@@ -1,26 +1,32 @@
 package frc.robot.drivetrain;
 
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.Ports.Drive.leftEncoderSourceA;
+import static frc.robot.Ports.Drive.leftEncoderSourceB;
+import static frc.robot.Ports.Drive.leftFollowerID;
+import static frc.robot.Ports.Drive.leftLeaderID;
+import static frc.robot.Ports.Drive.rightEncoderSourceA;
+import static frc.robot.Ports.Drive.rightEncoderSourceB;
+import static frc.robot.Ports.Drive.rightFollowerID;
+import static frc.robot.Ports.Drive.rightLeaderID;
+import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
+
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Ports.Drive.*;
-import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
-import static frc.robot.drivetrain.DrivetrainConstants.*;
+import frc.robot.drivetrain.DrivetrainConstants.PID;
 import frc.robot.positioning.Positioning;
 
-/**
- * The Drivetrain Subsystem.
- */
+/** The Drivetrain Subsystem. */
 public class Drivetrain extends SubsystemBase {
     // Instantiates motors
     private final CANSparkMax leftLeader = new CANSparkMax(leftLeaderID, kBrushless);
@@ -37,11 +43,8 @@ public class Drivetrain extends SubsystemBase {
 
     // Instantiates controller
     private final PIDController pidController = new PIDController(PID.P, PID.I, PID.D);
-    
 
-    /**
-     * Constructor.
-     */
+    /** Constructor. */
     public Drivetrain() {
         leftLeader.restoreFactoryDefaults();
         rightLeader.restoreFactoryDefaults();
@@ -60,8 +63,10 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Drives based on driver input.
      * 
-     * @param leftSpeed  Y-axis of left joystick.
-     * @param rightSpeed X-axis of right joystick.
+     * @param leftSpeed
+     *            Y-axis of left joystick.
+     * @param rightSpeed
+     *            X-axis of right joystick.
      * @return A command.
      */
     public Command drive(double leftSpeed, double rightSpeed) {
@@ -71,7 +76,8 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Drives a certain distance.
      *
-     * @param meters : distance to drive.
+     * @param meters
+     *            : distance to drive.
      * @return A command.
      */
     public Command drive(Measure<Distance> distance) {
@@ -97,8 +103,10 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Rotates a certain angle counterclockwise.
      *
-     * @param angle  : angle to rotate.
-     * @param negate : whether to rotate clockwise or not.
+     * @param angle
+     *            : angle to rotate.
+     * @param negate
+     *            : whether to rotate clockwise or not.
      * @return A command.
      */
     public Command rotateDegrees(Measure<Angle> angle, boolean negate) {
@@ -130,7 +138,8 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Rotates a certain angle counterclockwise.
      *
-     * @param angle : angle to rotate.
+     * @param angle
+     *            : angle to rotate.
      * @return A command.
      */
     public Command rotateDegrees(Measure<Angle> angle) {
@@ -158,7 +167,8 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Rotates to a certain absolute angle.
      *
-     * @param angle : angle to rotate to.
+     * @param angle
+     *            : angle to rotate to.
      * @return A command.
      */
     public Command rotateToAngle(Measure<Angle> angle) {
@@ -184,10 +194,7 @@ public class Drivetrain extends SubsystemBase {
                 .until(() -> pidController.atSetpoint());
     }
 
-    /**
-     * Faces robot towards bank.
-     * 
-     */
+    /** Faces robot towards bank. */
     public Command rotateTowardsBank() {
         leftEncoder.reset();
         rightEncoder.reset();
@@ -217,8 +224,10 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Faces robot towards a certain position.
      * 
-     * @param x : refrence point X.
-     * @param y : refrence point Y.
+     * @param x
+     *            : refrence point X.
+     * @param y
+     *            : refrence point Y.
      */
     public Command rotateTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
         leftEncoder.reset();

@@ -38,9 +38,7 @@ public class Robot extends CommandRobot {
       Ports.OperatorConstants.driverControllerPort);
   private static final Commands commands = new Commands(intake, elevator, shooter, drivetrain, operator);
 
-  /**
-   * This function is called every 20 ms, no matter the mode.
-   */
+  /** This function is called every 20 ms, no matter the mode. */
   @Override
   public void robotPeriodic() {
     // Updates the command sceduler

@@ -11,11 +11,12 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 
+/** Constants for the Shooter Subsystem. */
 public final class ShooterConstants {
     // Multiplies power of the shooter
     public static final double POWER_COEFFICIENT = 2;
 
-    // PID constants
+    /** Constants for PID */
     public static final class PID {
         public static final double kP = 0; // proportional
         public static final double kI = 0; // integral
@@ -24,7 +25,7 @@ public final class ShooterConstants {
         // Maximum accepted error in velocity of the motor
         public static final Measure<Velocity<Distance>> VELOCITY_TOLERANCE = MetersPerSecond.of(0);
     }
- 
+
     // How long it takes to launch the ball from the start of the command
     public static final Measure<Time> SHOOT_TIME = Seconds.of(1);
 
@@ -32,5 +33,5 @@ public final class ShooterConstants {
     public static final Measure<Angle> LAUNCH_ANGLE = Degrees.of(60);
 
     // The height of the point where the ball is launched
-    public static final Measure<Distance> SHOOTER_HEIGHT = Meters.of(0); // 
+    public static final Measure<Distance> SHOOTER_HEIGHT = Meters.of(0); //
 }

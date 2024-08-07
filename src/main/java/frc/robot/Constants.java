@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -11,12 +15,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
-
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.units.Voltage;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -32,20 +30,13 @@ import edu.wpi.first.units.Voltage;
  */
 
 public final class Constants {
-  // Constants for the operator
+  /** Constants for the operator. */
   public static class OperatorConstants {
     public static final int DRIVE_CONTROLLER_PORT = 0;
   }
 
-  // Constants for the field layout
+  /** Constants for the field layout. */
   public static class FieldConstants {
-    // 0,0 is at the center
-    // -90,156 is at the top left
-    // 90,156 is at the top right
-    // -90, -156 is at the bottom left
-    // 90, -156 is at the bottom right
-    // positive Y is up the field
-    // positive X is to the right
 
     public static final Translation2d BANK_POSITION = new Translation2d(Inches.of(132), Inches.of(90));
 
