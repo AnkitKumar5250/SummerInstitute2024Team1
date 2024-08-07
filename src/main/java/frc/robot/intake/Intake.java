@@ -11,12 +11,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.Ports.Intake.pivotPort;
 import static frc.robot.Ports.Intake.rollerPort;
 import static frc.robot.intake.IntakeConstants.*;
 import static frc.robot.intake.IntakeConstants.RETRACTED_ANGLE;
-import static frc.robot.intake.IntakeConstants.TARGET_VELOCITY;
 import static frc.robot.intake.IntakeConstants.EXTENDED_ANGLE;
 
 public class Intake extends SubsystemBase {
