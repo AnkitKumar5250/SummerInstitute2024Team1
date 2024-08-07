@@ -5,11 +5,11 @@
 package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.run;
-import static frc.robot.Constants.FieldConstants.AUTO_SCORE_POS_1;
-import static frc.robot.Constants.FieldConstants.AUTO_SCORE_POS_2;
-import static frc.robot.Constants.FieldConstants.BALL_ONE_POSITION;
-import static frc.robot.Constants.FieldConstants.BALL_THREE_POSITION;
-import static frc.robot.Constants.FieldConstants.BALL_TWO_POSITION;
+import static frc.robot.positioning.PositioningConstants.AUTO_SCORE_POS_1;
+import static frc.robot.positioning.PositioningConstants.AUTO_SCORE_POS_2;
+import static frc.robot.positioning.PositioningConstants.BALL_ONE_POSITION;
+import static frc.robot.positioning.PositioningConstants.BALL_THREE_POSITION;
+import static frc.robot.positioning.PositioningConstants.BALL_TWO_POSITION;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
