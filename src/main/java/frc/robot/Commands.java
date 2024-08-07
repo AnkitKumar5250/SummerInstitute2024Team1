@@ -12,6 +12,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.elevator.Elevator;
 import frc.robot.intake.Intake;
@@ -26,7 +27,8 @@ public class Commands {
     private final Drivetrain drivetrain;
     private final CommandXboxController operator;
 
-    public Commands(Intake intake, Elevator elevator, Shooter shooter, Drivetrain drivetrain, CommandXboxController operator) {
+    public Commands(Intake intake, Elevator elevator, Shooter shooter, Drivetrain drivetrain,
+            CommandXboxController operator) {
         this.intake = intake;
         this.elevator = elevator;
         this.shooter = shooter;
@@ -37,12 +39,22 @@ public class Commands {
     /**
      * Configures the button bindings.
      * 
-     * @param operator : Xbox controller.
+     * @param operator
+     *            : Xbox controller.
      */
     public void configureButtonBindings() {
         operator.rightBumper().whileTrue(intake());
         operator.leftBumper().onTrue(shoot());
         drivetrain.setDefaultCommand(drivetrain.drive(operator.getLeftY(), operator.getRightY()));
+    }
+
+    /**
+     * Triggers a command if the beambreak gets activated.
+     * 
+     * @return A trigger.
+     */
+    public Trigger BeamBreak() {
+        return new Trigger(() -> elevator.getBeamBreak());
     }
 
     /**
@@ -52,8 +64,9 @@ public class Commands {
      */
     public Command intake() {
         return intake.extend()
-                .alongWith(intake.start())
-                .alongWith(elevator.start());
+                .alongWith(intake.startRoller())
+                .alongWith(elevator.start()).finallyDo(() -> intake.stopRoller()).alongWith(elevator.stop())
+                .alongWith(intake.retract());
     }
 
     /**
@@ -72,7 +85,8 @@ public class Commands {
     /**
      * Drives a certain distance.
      * 
-     * @param distance : distance to drive.
+     * @param distance
+     *            : distance to drive.
      * @return A command.
      */
     public Command drive(Measure<Distance> distance) {
@@ -82,8 +96,10 @@ public class Commands {
     /**
      * Moves robot to a certain location.
      * 
-     * @param x : x coordinate of target location.
-     * @param y : y coordinate of target location.
+     * @param x
+     *            : x coordinate of target location.
+     * @param y
+     *            : y coordinate of target location.
      * @return A command.
      */
     public Command driveTo(Measure<Distance> x, Measure<Distance> y) {
@@ -94,7 +110,8 @@ public class Commands {
     /**
      * Moves the robot to a certain position on the field.
      * 
-     * @param translation : translation representing target location.
+     * @param translation
+     *            : translation representing target location.
      * @return A command.
      */
     public Command driveTo(Translation2d translation) {
@@ -104,7 +121,8 @@ public class Commands {
     /**
      * Turns the robot a certain amount of degrees.
      * 
-     * @param angle : angle to rotate by.
+     * @param angle
+     *            : angle to rotate by.
      * @return A command.
      */
     public Command rotate(Measure<Angle> angle) {
@@ -114,7 +132,8 @@ public class Commands {
     /**
      * Turns the robot to a certain orientation.
      * 
-     * @param angle : angle to rotate to.
+     * @param angle
+     *            : angle to rotate to.
      * @return A command.
      */
     public Command rotateTo(Measure<Angle> angle) {
@@ -124,7 +143,8 @@ public class Commands {
     /**
      * Turns the robot to a certain orientation.
      * 
-     * @param rotation : rotation to rotate to.
+     * @param rotation
+     *            : rotation to rotate to.
      * @return A command.
      */
     public Command rotateTo(Rotation2d rotation) {
@@ -134,11 +154,23 @@ public class Commands {
     /**
      * Moves the robot to a certain position and rotation.
      * 
-     * @param position : pose 2d representing the position.
+     * @param position
+     *            : pose 2d representing the position.
      * @return A command.
      */
     public Command moveTo(Pose2d position) {
         return driveTo(position.getTranslation()).andThen(rotateTo(position.getRotation()));
+    }
+
+    /**
+     * Scores a ball at a certain position
+     * 
+     * @param ballPosition
+     *            : position of the ball
+     * @return A command.
+     */
+    public Command score(Translation2d ballPosition) {
+        return intake().andThen(driveTo(ballPosition).finallyDo(() -> intake().cancel()));
     }
 
 }

@@ -1,5 +1,10 @@
 package frc.robot.elevator;
 
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Ports.Elevator.elevatorPort;
+import static frc.robot.Ports.Intake.beamBreakEntrancePort;
+import static frc.robot.intake.IntakeConstants.TARGET_VOLTAGE;
+
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
@@ -8,11 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static frc.robot.Ports.Elevator.elevatorPort;
-import static frc.robot.Ports.Intake.beamBreakEntrancePort;
-import static frc.robot.intake.IntakeConstants.TARGET_VELOCITY;
-
+/** The Elevator Subsystem. */
 public class Elevator extends SubsystemBase {
     // Instantiates motor
     private final CANSparkMax motor = new CANSparkMax(elevatorPort, MotorType.kBrushless);
@@ -20,16 +21,12 @@ public class Elevator extends SubsystemBase {
     // Instantiates beambreak
     private final DigitalInput beamBreak = new DigitalInput(beamBreakEntrancePort);
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     public Elevator() {
 
     }
 
-    /**
-     * Returns the reading of the beambreak
-     */
+    /** Returns the reading of the beambreak */
     public boolean getBeamBreak() {
         return this.beamBreak.get();
     }
@@ -41,9 +38,9 @@ public class Elevator extends SubsystemBase {
      */
     public Command start() {
         return runOnce(
-                () -> motor.set(TARGET_VELOCITY.in(MetersPerSecond)))
-                .andThen(Commands.idle(this))
-                .finallyDo(() -> motor.set(0));
+                () -> motor.set(TARGET_VOLTAGE.in(Volts)))
+                        .andThen(Commands.idle(this))
+                        .finallyDo(() -> motor.set(0));
     }
 
     /**
@@ -55,4 +52,5 @@ public class Elevator extends SubsystemBase {
         return runOnce(() -> motor.stopMotor()).andThen(Commands.idle(this))
                 .finallyDo(() -> motor.set(0));
     }
+
 }

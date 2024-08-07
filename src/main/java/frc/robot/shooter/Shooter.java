@@ -1,5 +1,16 @@
 package frc.robot.shooter;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static frc.robot.Constants.G;
+import static frc.robot.Ports.Shooter.motorPort;
+import static frc.robot.positioning.PositioningConstants.TARGET;
+import static frc.robot.shooter.ShooterConstants.LAUNCH_ANGLE;
+import static frc.robot.shooter.ShooterConstants.POWER_COEFFICIENT;
+import static frc.robot.shooter.ShooterConstants.SHOOTER_HEIGHT;
+
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -7,22 +18,12 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.G;
-import static frc.robot.Constants.FieldConstants.TARGET;
-import static frc.robot.Ports.Shooter.motorPort;
-import static frc.robot.shooter.ShooterConstants.LAUNCH_ANGLE;
-import static frc.robot.shooter.ShooterConstants.POWER_COEFFICIENT;
-import static frc.robot.shooter.ShooterConstants.SHOOTER_HEIGHT;
-
 import frc.robot.positioning.Positioning;
-import frc.robot.shooter.ShooterConstants.*;
+import frc.robot.shooter.ShooterConstants.PID;
 
+/** The Shooter Subsystem. */
 public class Shooter extends SubsystemBase {
     // Instantiates motor
     private final CANSparkMax motor = new CANSparkMax(motorPort, MotorType.kBrushless);
@@ -42,10 +43,11 @@ public class Shooter extends SubsystemBase {
 
         // sets the velocity tolerance of the pid controller
         pidController.setTolerance(PID.VELOCITY_TOLERANCE.in(MetersPerSecond));
-    } 
+    }
 
     /**
      * Turns off the motor.
+     * 
      * @return A command.
      */
     public Command turnOff() {
@@ -54,13 +56,14 @@ public class Shooter extends SubsystemBase {
 
     /**
      * Sets the velocity of the motor appropriate for scoring.
+     * 
      * @return A command.
      */
     public Command setVelocity() {
         Measure<Distance> xDifference = Meter.of(Math.abs(Positioning.robot.getX() - TARGET.getX()));
         Measure<Distance> yDifference = Meters.of(Math.abs(Positioning.robot.getY() - TARGET.getY()));
 
-        Measure<Distance> hDistance = Meters.of(Math.hypot(xDifference.in(Meters), yDifference.in(Meters))); 
+        Measure<Distance> hDistance = Meters.of(Math.hypot(xDifference.in(Meters), yDifference.in(Meters)));
         Measure<Distance> vDistance = Meters.of(TARGET.getZ() - SHOOTER_HEIGHT.in(Meters));
 
         double velocity = Math.sqrt((G.in(MetersPerSecond) * Math.pow(hDistance.in(Meters), 2)));
@@ -70,7 +73,8 @@ public class Shooter extends SubsystemBase {
 
         final double fVelocity = velocity * POWER_COEFFICIENT;
 
-        return runOnce(() -> pidController.setSetpoint(fVelocity)).andThen(run(() -> motor.setVoltage(pidController.calculate(encoder.getVelocity())))
-                .until(() -> pidController.atSetpoint()));
+        return runOnce(() -> pidController.setSetpoint(fVelocity))
+                .andThen(run(() -> motor.setVoltage(pidController.calculate(encoder.getVelocity())))
+                        .until(() -> pidController.atSetpoint()));
     }
 }
