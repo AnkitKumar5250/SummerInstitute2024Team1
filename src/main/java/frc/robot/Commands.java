@@ -20,16 +20,18 @@ import frc.robot.shooter.Shooter;
 import frc.robot.shooter.ShooterConstants;
 
 public class Commands {
-    private Intake intake = new Intake();
-    private Elevator elevator = new Elevator();
-    private Shooter shooter = new Shooter();
-    private Drivetrain drivetrain = new Drivetrain();
+    private final Intake intake;
+    private final Elevator elevator;
+    private final Shooter shooter;
+    private final Drivetrain drivetrain;
+    private final CommandXboxController operator;
 
-    public Commands(Intake intake, Elevator elevator, Shooter shooter, Drivetrain drivetrain) {
+    public Commands(Intake intake, Elevator elevator, Shooter shooter, Drivetrain drivetrain, CommandXboxController operator) {
         this.intake = intake;
         this.elevator = elevator;
         this.shooter = shooter;
         this.drivetrain = drivetrain;
+        this.operator = operator;
     }
 
     /**
@@ -37,7 +39,7 @@ public class Commands {
      * 
      * @param operator : Xbox controller.
      */
-    public void configureButtonBindings(CommandXboxController operator) {
+    public void configureButtonBindings() {
         operator.a().whileTrue(intake());
         operator.b().onTrue(shoot());
         drivetrain.setDefaultCommand(drivetrain.drive(operator.getLeftY(), operator.getRightY()));
@@ -51,8 +53,7 @@ public class Commands {
     public Command intake() {
         return intake.extend()
                 .alongWith(intake.start())
-                .alongWith(elevator.start())
-                .finallyDo(() -> intake.retract().alongWith(intake.stop()));
+                .alongWith(elevator.start());
     }
 
     /**
