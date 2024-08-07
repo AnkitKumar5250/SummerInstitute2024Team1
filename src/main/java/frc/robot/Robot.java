@@ -12,7 +12,6 @@ import frc.robot.elevator.Elevator;
 import frc.robot.intake.Intake;
 import frc.robot.shooter.Shooter;
 
-import static frc.robot.Constants.FieldConstants.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -29,10 +28,11 @@ public class Robot extends CommandRobot {
   private static final Shooter shooter = new Shooter();
   private static final Drivetrain drivetrain = new Drivetrain();
 
-  private static final Commands robot = new Commands(intake, elevator, shooter, drivetrain);
+  
 
   private static final CommandXboxController operator = new CommandXboxController(
       Ports.OperatorConstants.driverControllerPort);
+  private static final Commands commands = new Commands(intake, elevator, shooter, drivetrain, operator);
 
   /**
    * This function is called every 20 ms, no matter the mode.
@@ -42,43 +42,27 @@ public class Robot extends CommandRobot {
     CommandScheduler.getInstance().run();
   }
 
-  /** This function is called once each time the robot enters autonomous mode. */
-  @Override
-  public void autonomousInit() {
-    // This should cause the robot to shoot after picking up each ball, then move to
-    // the autoscore positions
-    robot.intake();
-    robot.driveTo(BALL_ONE_POSITION).andThen(robot.shoot());
-    robot.driveTo(BALL_TWO_POSITION).andThen(robot.shoot());
-    robot.driveTo(BALL_THREE_POSITION).andThen(robot.shoot());
 
-    robot.moveTo(AUTO_SCORE_POS_1);
-  }
+  // //idc
+  // @Override
+  // public void autonomousInit() {}
 
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {
-    robot.moveTo(AUTO_SCORE_POS_2).andThen(robot.shoot());
-
-    // Runs shoot command when beambrake is triggered
-    if (elevator.getBeamBreak()) {
-      robot.shoot();
-    }
-
-  }
+  // //idc
+  // @Override
+  // public void autonomousPeriodic() {}
 
   @Override
   public void teleopInit() {
     // Cancels all autonomous commands at the beggining of telop
     CommandScheduler.getInstance().cancelAll();
-    robot.configureButtonBindings(operator);
+    commands.configureButtonBindings();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
     if (elevator.getBeamBreak()) {
-      robot.shoot();
+      commands.shoot();
     }
   }
 

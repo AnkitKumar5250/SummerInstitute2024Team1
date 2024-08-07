@@ -7,6 +7,7 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -29,14 +30,12 @@ public class Intake extends SubsystemBase {
 
         // Instantiates controllers
         private final PIDController pidControllerPivot = new PIDController(PivotPID.P, PivotPID.I, PivotPID.D);
-        private final PIDController pidControllerRoller = new PIDController(RollerPID.P, RollerPID.I, RollerPID.D);
 
         /**
          * Constructor
          */
         public Intake() {
                 pidControllerPivot.setTolerance(PivotPID.ANGLE_TOLERANCE.in(Degrees));
-                pidControllerRoller.setTolerance(RollerPID.VELOCITY_TOLERANCE.in(MetersPerSecond));
         }
 
         /**
@@ -69,10 +68,9 @@ public class Intake extends SubsystemBase {
          * @return A command.
          */
         public Command start() {
-                return runOnce(() -> pidControllerRoller.setSetpoint(TARGET_VELOCITY.in(MetersPerSecond))).andThen(run(
-                                () -> roller.set(
-                                                pidControllerRoller.calculate(rollerEncoder.getVelocity())))
-                                .until(() -> pidControllerRoller.atSetpoint()));
+                return runOnce(() -> roller.set(.7))
+                .andThen(Commands.idle(this))
+                .finallyDo(() -> roller.set(0));
         }
 
         /**
