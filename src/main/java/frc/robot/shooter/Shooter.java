@@ -14,6 +14,7 @@ import static frc.robot.shooter.ShooterConstants.SHOOTER_HEIGHT;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Distance;
@@ -40,6 +41,7 @@ public class Shooter extends SubsystemBase {
     public Shooter() {
         // inverted motor(testing motor resulted in ball launched opposite direction)
         motor.setInverted(true);
+        motor.setIdleMode(IdleMode.kCoast);
 
         // sets the velocity tolerance of the pid controller
         pidController.setTolerance(PID.VELOCITY_TOLERANCE.in(MetersPerSecond));
