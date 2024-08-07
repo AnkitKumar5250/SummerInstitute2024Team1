@@ -15,6 +15,8 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.intake.IntakeConstants.PivotFFD;
@@ -29,8 +31,8 @@ public class Intake extends SubsystemBase {
     // Instantiates encoders
     private final AbsoluteEncoder pivotEncoder = pivot.getAbsoluteEncoder();
 
-    // Instantiates controllers
-    private final PIDController pidControllerPivot = new PIDController(PivotPID.P, PivotPID.I, PivotPID.D);
+    // Instantiates controllers1, 
+    private final ProfiledPIDController pidControllerPivot = new ProfiledPIDController(PivotPID.P, PivotPID.I, PivotPID.D, new TrapezoidProfile.Constraints(1,1));
     private final ArmFeedforward armFeedforward = new ArmFeedforward(PivotFFD.S, PivotFFD.G, PivotFFD.V,
             PivotFFD.A);
 
@@ -45,12 +47,7 @@ public class Intake extends SubsystemBase {
      * @return A command.
      */
     public Command extend() {
-        return runOnce(() -> pidControllerPivot.setSetpoint(EXTENDED_ANGLE.in(Degrees)))
-                .andThen(run(() -> pivot.setVoltage(
-                        pidControllerPivot.calculate(pivotEncoder.getPosition() * 360)
-                                + armFeedforward.calculate(EXTENDED_ANGLE.in(Radians),
-                                        pivotEncoder.getVelocity())))
-                                                .until(() -> pidControllerPivot.atSetpoint()));
+        return goTo(EXTENDED_ANGLE.in(Degrees));
     }
 
     /**
@@ -59,15 +56,17 @@ public class Intake extends SubsystemBase {
      * @return A command.
      */
     public Command retract() {
-        return runOnce(() -> pidControllerPivot.setSetpoint(RETRACTED_ANGLE.in(Degrees)))
-                .andThen(run(() -> pivot.setVoltage(
-                        pidControllerPivot.calculate(pivotEncoder.getPosition() * 360)
-                                + armFeedforward.calculate(RETRACTED_ANGLE.in(Radians),
-                                        pivotEncoder.getVelocity())))
-                                                .until(() -> pidControllerPivot.atSetpoint()));
+        return goTo(RETRACTED_ANGLE.in(Degrees));
 
     }
-
+    private Command goTo(double angle){
+        return runOnce(() -> pidControllerPivot.setGoal(angle))
+                .andThen(run(() -> pivot.setVoltage(
+                        pidControllerPivot.calculate(pivotEncoder.getPosition() * 360)
+                                + armFeedforward.calculate(pidControllerPivot.getSetpoint().position,
+                                                pidControllerPivot.getSetpoint().velocity))))
+                                                .until(() -> pidControllerPivot.atSetpoint());
+    }
     /**
      * Starts the rollers.
      *
