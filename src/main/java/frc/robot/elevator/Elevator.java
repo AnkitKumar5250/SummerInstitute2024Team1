@@ -8,10 +8,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Ports.Elevator.elevatorPort;
 import static frc.robot.Ports.Intake.beamBreakEntrancePort;
-import static frc.robot.intake.IntakeConstants.TARGET_VELOCITY;
+import static frc.robot.intake.IntakeConstants.TARGET_VOLTAGE;
 
 public class Elevator extends SubsystemBase {
     // Instantiates motor
@@ -41,7 +41,7 @@ public class Elevator extends SubsystemBase {
      */
     public Command start() {
         return runOnce(
-                () -> motor.set(TARGET_VELOCITY.in(MetersPerSecond)))
+                () -> motor.set(TARGET_VOLTAGE.in(Volts)))
                 .andThen(Commands.idle(this))
                 .finallyDo(() -> motor.set(0));
     }

@@ -3,19 +3,19 @@ package frc.robot.intake;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Ports.Intake.pivotPort;
 import static frc.robot.Ports.Intake.rollerPort;
 import static frc.robot.intake.IntakeConstants.*;
 import static frc.robot.intake.IntakeConstants.RETRACTED_ANGLE;
-import static frc.robot.intake.IntakeConstants.TARGET_VELOCITY;
 import static frc.robot.intake.IntakeConstants.EXTENDED_ANGLE;
 
 public class Intake extends SubsystemBase {
@@ -25,18 +25,17 @@ public class Intake extends SubsystemBase {
 
         // Instantiates encoders
         private final AbsoluteEncoder pivotEncoder = pivot.getAbsoluteEncoder();
-        private final RelativeEncoder rollerEncoder = roller.getEncoder();
 
         // Instantiates controllers
         private final PIDController pidControllerPivot = new PIDController(PivotPID.P, PivotPID.I, PivotPID.D);
-        private final PIDController pidControllerRoller = new PIDController(RollerPID.P, RollerPID.I, RollerPID.D);
+        private final ArmFeedforward armFeedforward = new ArmFeedforward(PivotFFD.S, PivotFFD.G, PivotFFD.V,
+                        PivotFFD.A);
 
         /**
          * Constructor
          */
         public Intake() {
                 pidControllerPivot.setTolerance(PivotPID.ANGLE_TOLERANCE.in(Degrees));
-                pidControllerRoller.setTolerance(RollerPID.VELOCITY_TOLERANCE.in(MetersPerSecond));
         }
 
         /**
@@ -45,8 +44,11 @@ public class Intake extends SubsystemBase {
          * @return A command.
          */
         public Command extend() {
-                return runOnce(() -> pidControllerPivot.setSetpoint(EXTENDED_ANGLE.in(Degrees))).andThen(run(
-                                () -> pivot.setVoltage(pidControllerPivot.calculate(pivotEncoder.getPosition() * 360)))
+                return runOnce(() -> pidControllerPivot.setSetpoint(EXTENDED_ANGLE.in(Degrees)))
+                .andThen(run(() -> pivot.setVoltage(
+                                pidControllerPivot.calculate(pivotEncoder.getPosition() * 360)
+                                                + armFeedforward.calculate(EXTENDED_ANGLE.in(Radians),
+                                                                pivotEncoder.getVelocity())))
                                 .until(() -> pidControllerPivot.atSetpoint()));
         }
 
@@ -58,7 +60,9 @@ public class Intake extends SubsystemBase {
         public Command retract() {
                 return runOnce(() -> pidControllerPivot.setSetpoint(RETRACTED_ANGLE.in(Degrees)))
                                 .andThen(run(() -> pivot.setVoltage(
-                                                pidControllerPivot.calculate(pivotEncoder.getPosition() * 360)))
+                                                pidControllerPivot.calculate(pivotEncoder.getPosition() * 360)
+                                                                + armFeedforward.calculate(RETRACTED_ANGLE.in(Radians),
+                                                                                pivotEncoder.getVelocity())))
                                                 .until(() -> pidControllerPivot.atSetpoint()));
 
         }
@@ -69,10 +73,7 @@ public class Intake extends SubsystemBase {
          * @return A command.
          */
         public Command start() {
-                return runOnce(() -> pidControllerRoller.setSetpoint(TARGET_VELOCITY.in(MetersPerSecond))).andThen(run(
-                                () -> roller.set(
-                                                pidControllerRoller.calculate(rollerEncoder.getVelocity())))
-                                .until(() -> pidControllerRoller.atSetpoint()));
+                return runOnce(() -> roller.setVoltage(TARGET_VOLTAGE.in(Volts)));
         }
 
         /**
