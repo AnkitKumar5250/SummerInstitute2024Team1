@@ -32,10 +32,12 @@ import edu.wpi.first.units.Voltage;
  */
 
 public final class Constants {
+  // Constants for the operator
   public static class OperatorConstants {
-    public static final int DRIVE_CONTROLLER_PORT = 0; //
+    public static final int DRIVE_CONTROLLER_PORT = 0;
   }
 
+  // Constants for the field layout
   public static class FieldConstants {
     // 0,0 is at the center
     // -90,156 is at the top left
@@ -80,6 +82,6 @@ public final class Constants {
 
   }
 
+  // Gravitational constant
   public static final Measure<Velocity<Distance>> G = MetersPerSecond.of(9.81);
-  public static final Measure<Voltage> MINIMUM_VOLTAGE_THRESHHOLD = Volts.of(0.1); //
 }

@@ -11,85 +11,66 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.G;
 import static frc.robot.Constants.FieldConstants.TARGET;
-import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
 import static frc.robot.Ports.Shooter.motorPort;
-import frc.robot.positioning.Positioning;
 import static frc.robot.shooter.ShooterConstants.LAUNCH_ANGLE;
 import static frc.robot.shooter.ShooterConstants.POWER_COEFFICIENT;
 import static frc.robot.shooter.ShooterConstants.SHOOTER_HEIGHT;
-import static frc.robot.shooter.ShooterConstants.kD;
-import static frc.robot.shooter.ShooterConstants.kI;
-import static frc.robot.shooter.ShooterConstants.kP;
+
+import frc.robot.positioning.Positioning;
+import frc.robot.shooter.ShooterConstants.*;
 
 public class Shooter extends SubsystemBase {
+    // Instantiates motor
     private final CANSparkMax motor = new CANSparkMax(motorPort, MotorType.kBrushless);
+
+    // Instantiates encoder
     private final RelativeEncoder encoder = motor.getEncoder();
-    private final PIDController pid = new PIDController(kP, kI, kD);
 
-    /**
-     * Calculates the amount of power neccesary to score the cell into the bank.
-     * 
-     * @return The power that the ball needs to be launched at.
-     */
-    public double calcVelocity() {
-        Measure<Distance> xDifference = Meter.of(Math.abs(Positioning.robot.getX() - TARGET.getX()));
-        Measure<Distance> yDifference = Meters.of(Math.abs(Positioning.robot.getY() - TARGET.getY()));
-
-        Measure<Distance> hDistance = Meters.of(Math.hypot(xDifference.in(Meters), yDifference.in(Meters))); // hypotenuse distance
-        Measure<Distance> vDistance = Meters.of(TARGET.getZ() - SHOOTER_HEIGHT.in(Meters)); // height difference
-
-        double velocity = Math
-                .sqrt((G.in(MetersPerSecond) * Math.pow(hDistance.in(Meters), 2)
-                        * Math.pow(1 / Math.cos(LAUNCH_ANGLE.in(Degrees)), 2))
-                        / (2 * (Math.tan(LAUNCH_ANGLE.in(Degrees)) * hDistance.in(Meters) - vDistance.in(Meters))));
-        velocity *= POWER_COEFFICIENT;
-        return velocity;
-    }
+    // Instantiates pidController controller
+    private final PIDController pidController = new PIDController(PID.kP, PID.kI, PID.kD);
 
     /**
      * Constructor.
      */
     public Shooter() {
+        // inverted motor(testing motor resulted in ball launched opposite direction)
         motor.setInverted(true);
-    } // inverted motor(testing motor resulted in ball launched opposite direction)
 
-    /**
-     * Returns the velocity of the motor in RPM.
-     * 
-     * @return The velocity of the motor.
-     */
-    private double getVelocity() {
-        return encoder.getVelocity();
-    }
+        // sets the velocity tolerance of the pid controller
+        pidController.setTolerance(PID.VELOCITY_TOLERANCE.in(MetersPerSecond));
+    } 
 
     /**
      * Turns off the motor.
+     * @return A command.
      */
     public Command turnOff() {
         return runOnce(() -> motor.stopMotor());
     }
 
     /**
-     * Sets the velocity of the motor using PID.
-     * 
-     * @param velocity The target velocity of the motor.
-     */
-    public Command setVelocity(Measure<Velocity<Distance>> velocity) {
-        return run(() -> motor.setVoltage(pid.calculate(getVelocity(), velocity.in(MetersPerSecond))))
-                .until(() -> motor.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
-    }
-
-    /**
      * Sets the velocity of the motor appropriate for scoring.
+     * @return A command.
      */
     public Command setVelocity() {
-        return run(() -> motor.setVoltage(pid.calculate(getVelocity(), calcVelocity())))
-                .until(() -> motor.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+        Measure<Distance> xDifference = Meter.of(Math.abs(Positioning.robot.getX() - TARGET.getX()));
+        Measure<Distance> yDifference = Meters.of(Math.abs(Positioning.robot.getY() - TARGET.getY()));
+
+        Measure<Distance> hDistance = Meters.of(Math.hypot(xDifference.in(Meters), yDifference.in(Meters))); 
+        Measure<Distance> vDistance = Meters.of(TARGET.getZ() - SHOOTER_HEIGHT.in(Meters));
+
+        double velocity = Math.sqrt((G.in(MetersPerSecond) * Math.pow(hDistance.in(Meters), 2)));
+
+        velocity *= Math.pow(1 / Math.cos(LAUNCH_ANGLE.in(Degrees)), 2);
+        velocity /= (2 * (Math.tan(LAUNCH_ANGLE.in(Degrees)) * hDistance.in(Meters) - vDistance.in(Meters)));
+
+        final double fVelocity = velocity * POWER_COEFFICIENT;
+
+        return runOnce(() -> pidController.setSetpoint(fVelocity)).andThen(run(() -> motor.setVoltage(pidController.calculate(encoder.getVelocity())))
+                .until(() -> pidController.atSetpoint()));
     }
 }

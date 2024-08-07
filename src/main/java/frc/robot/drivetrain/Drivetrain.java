@@ -4,18 +4,16 @@ import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.MINIMUM_VOLTAGE_THRESHHOLD;
 import static frc.robot.Ports.Drive.rightEncoderSourceA;
 import static frc.robot.Ports.Drive.rightEncoderSourceB;
 import static frc.robot.Ports.Drive.rightFollowerID;
@@ -25,9 +23,9 @@ import static frc.robot.Ports.Drive.leftEncoderSourceB;
 import static frc.robot.Ports.Drive.leftFollowerID;
 import static frc.robot.Ports.Drive.leftLeaderID;
 import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
-import static frc.robot.drivetrain.DrivetrainConstants.D;
-import static frc.robot.drivetrain.DrivetrainConstants.I;
-import static frc.robot.drivetrain.DrivetrainConstants.P;
+import static frc.robot.drivetrain.DrivetrainConstants.*;
+
+import frc.robot.drivetrain.DrivetrainConstants.PID;
 import frc.robot.positioning.Positioning;
 
 /**
@@ -47,8 +45,9 @@ public class Drivetrain extends SubsystemBase {
     private final Encoder leftEncoder = new Encoder(leftEncoderSourceA, leftEncoderSourceB);
     private final Encoder rightEncoder = new Encoder(rightEncoderSourceA, rightEncoderSourceB);
 
-    // Instantiates PID controllers
-    private final PIDController pidControllerTranslation = new PIDController(P, I, D);
+    // Instantiates controller
+    private final PIDController pidController = new PIDController(PID.P, PID.I, PID.D);
+    
 
     /**
      * Constructor.
@@ -76,7 +75,7 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public Command drive(double leftSpeed, double rightSpeed) {
-        return Commands.run(() -> diffDrive.tankDrive(leftSpeed, -rightSpeed));
+        return run(() -> diffDrive.tankDrive(leftSpeed, -rightSpeed));
     }
 
     /**
@@ -89,10 +88,10 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() -> {
+        return run(() -> {
             double voltage;
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            voltage = pidControllerTranslation.calculate(encoderValue, distance.in(Meters));
+            voltage = pidController.calculate(encoderValue, distance.in(Meters));
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
@@ -102,7 +101,7 @@ public class Drivetrain extends SubsystemBase {
             rightLeader.set(voltage);
 
             Positioning.updateRobotPosition(encoderValue, false);
-        }).until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+        }).until(() -> pidController.atSetpoint());
     }
 
     /**
@@ -116,11 +115,11 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() -> {
+        return run(() -> {
             double distance = angle.in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            double voltage = pidControllerTranslation.calculate(encoderValue, distance);
+            double voltage = pidController.calculate(encoderValue, distance);
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
@@ -135,7 +134,7 @@ public class Drivetrain extends SubsystemBase {
 
             Positioning.updateRobotPosition(encoderValue, true);
         })
-                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+                .until(() -> pidController.atSetpoint());
     }
 
     /**
@@ -148,11 +147,11 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() -> {
+        return run(() -> {
             double distance = angle.in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            double voltage = pidControllerTranslation.calculate(encoderValue, distance);
+            double voltage = pidController.calculate(encoderValue, distance);
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
@@ -163,7 +162,7 @@ public class Drivetrain extends SubsystemBase {
 
             Positioning.updateRobotPosition(encoderValue, true);
         })
-                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+                .until(() -> pidController.atSetpoint());
     }
 
     /**
@@ -176,12 +175,12 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() -> {
+        return run(() -> {
             double distance = angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees())).in(Degrees)
                     * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            double voltage = pidControllerTranslation.calculate(encoderValue, distance);
+            double voltage = pidController.calculate(encoderValue, distance);
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
@@ -192,7 +191,7 @@ public class Drivetrain extends SubsystemBase {
 
             Positioning.updateRobotPosition(encoderValue, true);
         })
-                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+                .until(() -> pidController.atSetpoint());
     }
 
     /**
@@ -203,12 +202,12 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() -> {
+        return run(() -> {
             double distance = Positioning.calcAngleTowardsBank().in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI
                     / 360;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            double voltage = pidControllerTranslation.calculate(encoderValue, distance);
+            double voltage = pidController.calculate(encoderValue, distance);
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
@@ -222,7 +221,7 @@ public class Drivetrain extends SubsystemBase {
 
             Positioning.updateRobotPosition(encoderValue, true);
         })
-                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+                .until(() -> pidController.atSetpoint());
     }
 
     /**
@@ -235,13 +234,13 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        return Commands.run(() -> {
+        return run(() -> {
             double distance = Positioning.calcAngleTowardsPosition(x, y).in(Degrees) * TURNING_RADIUS.in(Meters) * 2
                     * Math.PI
                     / 360;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
-            double voltage = pidControllerTranslation.calculate(encoderValue, distance);
+            double voltage = pidController.calculate(encoderValue, distance);
 
             if (Math.abs(voltage) > 1) {
                 voltage = Math.copySign(1, voltage);
@@ -255,7 +254,7 @@ public class Drivetrain extends SubsystemBase {
 
             Positioning.updateRobotPosition(encoderValue, true);
         })
-                .until(() -> leftLeader.getBusVoltage() < MINIMUM_VOLTAGE_THRESHHOLD.in(Volts));
+                .until(() -> pidController.atSetpoint());
     }
 
 }
