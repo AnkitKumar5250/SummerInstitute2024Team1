@@ -24,7 +24,7 @@ public class Elevator extends SubsystemBase {
      * Constructor
      */
     public Elevator() {
-
+        
     }
 
     /**
@@ -55,4 +55,5 @@ public class Elevator extends SubsystemBase {
         return runOnce(() -> motor.stopMotor()).andThen(Commands.idle(this))
                 .finallyDo(() -> motor.set(0));
     }
+
 }

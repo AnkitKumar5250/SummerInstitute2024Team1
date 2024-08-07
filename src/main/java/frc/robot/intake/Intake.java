@@ -72,7 +72,7 @@ public class Intake extends SubsystemBase {
          *
          * @return A command.
          */
-        public Command start() {
+        public Command startRoller() {
                 return runOnce(() -> roller.setVoltage(TARGET_VOLTAGE.in(Volts)));
         }
 
@@ -81,7 +81,7 @@ public class Intake extends SubsystemBase {
          *
          * @return A command.
          */
-        public Command stop() {
+        public Command stopRoller() {
                 return runOnce(() -> roller.stopMotor());
         }
 

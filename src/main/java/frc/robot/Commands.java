@@ -12,6 +12,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.elevator.Elevator;
 import frc.robot.intake.Intake;
@@ -40,9 +41,18 @@ public class Commands {
      * @param operator : Xbox controller.
      */
     public void configureButtonBindings() {
-        operator.a().whileTrue(intake());
-        operator.b().onTrue(shoot());
+        operator.leftTrigger().whileTrue(intake());
+        operator.rightTrigger().onTrue(shoot());
+
         drivetrain.setDefaultCommand(drivetrain.drive(operator.getLeftY(), operator.getRightY()));
+    }
+
+    /**
+     * Triggers a command if the beambreak gets activated.
+     * @return A trigger.
+     */
+    public Trigger BeamBreak() {
+        return new Trigger(() -> elevator.getBeamBreak());
     }
 
     /**
@@ -52,8 +62,8 @@ public class Commands {
      */
     public Command intake() {
         return intake.extend()
-                .alongWith(intake.start())
-                .alongWith(elevator.start());
+                .alongWith(intake.startRoller())
+                .alongWith(elevator.start()).finallyDo(() -> intake.stopRoller()).alongWith(elevator.stop()).alongWith(intake.retract());
     }
 
     /**
@@ -139,6 +149,15 @@ public class Commands {
      */
     public Command moveTo(Pose2d position) {
         return driveTo(position.getTranslation()).andThen(rotateTo(position.getRotation()));
+    }
+
+    /**
+     * Scores a ball at a certain position
+     * @param ballPosition : position of the ball
+     * @return A command.
+     */
+    public Command score(Translation2d ballPosition) {
+        return intake().andThen(driveTo(ballPosition).finallyDo(() -> intake().cancel()));
     }
 
 }
