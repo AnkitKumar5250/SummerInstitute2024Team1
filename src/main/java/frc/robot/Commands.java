@@ -3,6 +3,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -45,7 +46,7 @@ public class Commands {
     public void configureButtonBindings() {
         operator.rightBumper().whileTrue(intake());
         operator.leftBumper().onTrue(shoot());
-        drivetrain.setDefaultCommand(drivetrain.drive(operator.getLeftY(), operator.getRightY()));
+        drivetrain.setDefaultCommand(drivetrain.drive(operator.getLeftY(), operator.getRightX()));
     }
 
     /**
@@ -78,7 +79,7 @@ public class Commands {
         return drivetrain
                 .rotateTowardsBank()
                 .alongWith(shooter.setVelocity()).withTimeout(ShooterConstants.SHOOT_TIME.in(Seconds))
-                .finallyDo(() -> drivetrain.rotateDegrees(Positioning.calcAngleTowardsBank(), true)
+                .finallyDo(() -> drivetrain.rotateDegrees(Positioning.calcAngleTowardsBank().negate())
                         .alongWith(shooter.turnOff()));
     }
 
@@ -170,7 +171,7 @@ public class Commands {
      * @return A command.
      */
     public Command score(Translation2d ballPosition) {
-        return intake().andThen(driveTo(ballPosition).finallyDo(() -> intake().cancel()));
+        return intake().andThen(driveTo(ballPosition).finallyDo(() -> shoot()).alongWith(runOnce(() -> intake().cancel())));
     }
 
 }

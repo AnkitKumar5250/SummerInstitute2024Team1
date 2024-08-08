@@ -38,7 +38,7 @@ public class Elevator extends SubsystemBase {
      */
     public Command start() {
         return runOnce(
-                () -> motor.set(TARGET_VOLTAGE.in(Volts)))
+                () -> motor.setVoltage(TARGET_VOLTAGE.in(Volts)))
                         .andThen(Commands.idle(this))
                         .finallyDo(() -> motor.set(0));
     }
