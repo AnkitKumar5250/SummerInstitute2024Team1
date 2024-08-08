@@ -30,7 +30,7 @@ public class Intake extends SubsystemBase {
     private final AbsoluteEncoder pivotEncoder = pivot.getAbsoluteEncoder();
 
     // Instantiates controllers
-    private final PIDController pidControllerPivot = new PIDController(PivotPID.P, PivotPID.I, PivotPID.D);
+    private final prof pidControllerPivot = new PIDController(PivotPID.P, PivotPID.I, PivotPID.D);
     private final ArmFeedforward armFeedforward = new ArmFeedforward(PivotFFD.S, PivotFFD.G, PivotFFD.V,
             PivotFFD.A);
 
