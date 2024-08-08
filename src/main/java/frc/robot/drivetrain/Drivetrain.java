@@ -3,7 +3,6 @@ package frc.robot.drivetrain;
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 import static frc.robot.Ports.Drive.leftEncoderSourceA;
@@ -27,7 +26,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -45,7 +43,7 @@ public class Drivetrain extends SubsystemBase {
     private final CANSparkMax rightFollower = new CANSparkMax(rightFollowerID, kBrushless);
 
     // Instantiates Differential Drive
-    private final DifferentialDrive diffDrive = new DifferentialDrive(leftLeader, rightLeader);
+    // private final DifferentialDrive diffDrive = new DifferentialDrive(leftLeader, rightLeader);
 
     // Instantiates encoders
     private final Encoder leftEncoder = new Encoder(leftEncoderSourceA, leftEncoderSourceB);
@@ -55,14 +53,14 @@ public class Drivetrain extends SubsystemBase {
     private final PIDController pidController = new PIDController(PID.P, PID.I, PID.D);
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 0, 0);
 
-    /**
-     * Uses PID and FFD output to calculate velocity, and then converts that to
-     * voltage.
-     * 
-     * @return voltage.
-     */
-    private final Measure<Voltage> calculateVoltage() {
-        double pidOutput = pidController.calculate(rightEncoder.getDistance());
+/**
+ * use when setting voltage of motor
+ * @param encoder
+ * @param setpoint
+ * @return
+ */
+    private final Measure<Voltage> calculateVoltage(Encoder encoder, double setpoint) {
+        double pidOutput = pidController.calculate(encoder.getDistance(), setpoint);
         double ffdOutput = feedforward.calculate(pidOutput);
         Measure<Voltage> voltage = Volts.of((pidOutput * VOLTS_TO_VELOCTIY.in(VoltsPerMeterPerSecond) + ffdOutput) / 2);
         if (voltage.gt(MAXIMUM_VOLTAGE)) {
@@ -106,8 +104,8 @@ public class Drivetrain extends SubsystemBase {
      */
     public Command drive(double leftSpeed, double rightSpeed) {
         return run(() -> {
-            leftLeader.setVoltage(pidController.calculate(leftEncoder.getDistance(), leftSpeed));
-            rightLeader.setVoltage(pidController.calculate(rightEncoder.getDistance(), rightSpeed));
+            leftLeader.setVoltage(calculateVoltage(leftEncoder, leftSpeed).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder, rightSpeed).in(Volts));
         });
     }
 
@@ -125,11 +123,11 @@ public class Drivetrain extends SubsystemBase {
         pidController.setSetpoint(distance.in(Meters));
 
         return run(() -> {
-            leftLeader.setVoltage(calculateVoltage().in(Volts));
-            rightLeader.setVoltage(calculateVoltage().in(Volts));
+            leftLeader.setVoltage(calculateVoltage(leftEncoder, distance.in(Meters)).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder, distance.in(Meters)).in(Volts));
 
             Positioning.updateRobotPosition(rightEncoder.getDistance(), false);
-        }).until(() -> pidController.atSetpoint());
+        }).until(pidController::atSetpoint);
     }
 
     /**
@@ -150,15 +148,14 @@ public class Drivetrain extends SubsystemBase {
             distance = angle.in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
         }
 
-        pidController.setSetpoint(distance);
 
         return run(() -> {
-            leftLeader.setVoltage(-calculateVoltage().in(Volts));
-            rightLeader.setVoltage(calculateVoltage().in(Volts));
+            leftLeader.setVoltage(-calculateVoltage(rightEncoder, distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder, distance).in(Volts));
 
             Positioning.updateRobotPosition(rightEncoder.getDistance(), true);
         })
-                .until(() -> pidController.atSetpoint());
+                .until(pidController::atSetpoint);
     }
 
     /**
@@ -175,16 +172,14 @@ public class Drivetrain extends SubsystemBase {
         double distance = angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees())).in(Degrees)
                 * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
 
-        pidController.setSetpoint(distance);
-
         return run(() -> {
 
-            leftLeader.setVoltage(-calculateVoltage().in(Volts));
-            rightLeader.setVoltage(calculateVoltage().in(Volts));
+            leftLeader.setVoltage(-calculateVoltage(rightEncoder, distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder, distance).in(Volts));
 
             Positioning.updateRobotPosition(rightEncoder.getDistance(), true);
         })
-                .until(() -> pidController.atSetpoint());
+                .until(pidController::atSetpoint);
     }
 
     /** Faces robot towards bank. */
@@ -194,16 +189,15 @@ public class Drivetrain extends SubsystemBase {
 
         double distance = Positioning.calcAngleTowardsBank().in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI
                 / 360;
-        pidController.setSetpoint(distance);
 
         return run(() -> {
 
-            leftLeader.setVoltage(-calculateVoltage().in(Volts));
-            rightLeader.setVoltage(calculateVoltage().in(Volts));
+            leftLeader.setVoltage(-calculateVoltage(rightEncoder, distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder, distance).in(Volts));
 
             Positioning.updateRobotPosition(rightEncoder.getDistance(), true);
         })
-                .until(() -> pidController.atSetpoint());
+                .until(pidController::atSetpoint);
     }
 
     /**
@@ -225,12 +219,12 @@ public class Drivetrain extends SubsystemBase {
 
         return run(() -> {
 
-            leftLeader.setVoltage(-calculateVoltage().in(Volts));
-            rightLeader.setVoltage(calculateVoltage().in(Volts));
+            leftLeader.setVoltage(-calculateVoltage(rightEncoder, distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder, distance).in(Volts));
 
             Positioning.updateRobotPosition(rightEncoder.getDistance(), true);
         })
-                .until(() -> pidController.atSetpoint());
+                .until(pidController::atSetpoint);
     }
 
 }
