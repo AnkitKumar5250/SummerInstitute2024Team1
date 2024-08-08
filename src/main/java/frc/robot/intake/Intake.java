@@ -71,6 +71,10 @@ public class Intake extends SubsystemBase {
 
     /** Constructor */
     public Intake() {
+        roller.restoreFactoryDefaults();
+        roller.burnFlash();
+        pivot.restoreFactoryDefaults();
+        pivot.burnFlash();
         pidControllerPivot.setTolerance(PivotPID.ANGLE_TOLERANCE.in(Degrees));
     }
 
