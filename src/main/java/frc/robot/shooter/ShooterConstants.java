@@ -54,4 +54,7 @@ public final class ShooterConstants {
     // Maximum and minimum voltage values of the motor
     public static final Measure<Voltage> MAXIMUM_VOLTAGE = Volts.of(0);
     public static final Measure<Voltage> MINIMUM_VOLTAGE = Volts.of(0);
+
+    // Gravitational constant
+    public static final Measure<Velocity<Distance>> G = MetersPerSecond.of(9.81);
 }

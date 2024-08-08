@@ -4,12 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
-
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -29,6 +23,5 @@ public final class Constants {
     public static final int DRIVE_CONTROLLER_PORT = 0;
   }
 
-  // Gravitational constant
-  public static final Measure<Velocity<Distance>> G = MetersPerSecond.of(9.81);
+  
 }
