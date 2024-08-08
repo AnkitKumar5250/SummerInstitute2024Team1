@@ -29,6 +29,7 @@ import frc.robot.shooter.Shooter;
  * project.
  */
 public class Robot extends CommandRobot {
+  // reorder shoot code
   private static final Intake intake = new Intake();
   private static final Elevator elevator = new Elevator();
   private static final Shooter shooter = new Shooter();
