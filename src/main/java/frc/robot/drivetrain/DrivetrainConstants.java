@@ -10,9 +10,6 @@ import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N7;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Per;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 
