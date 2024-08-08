@@ -105,14 +105,10 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public Command drive(double leftSpeed, double rightSpeed) {
-<<<<<<< HEAD
         return run(() -> {
             leftLeader.setVoltage(pidController.calculate(leftEncoder.getDistance(), leftSpeed));
             rightLeader.setVoltage(pidController.calculate(rightEncoder.getDistance(), rightSpeed));
         });
-=======
-        return run(() -> diffDrive.arcadeDrive(leftSpeed, rightSpeed));
->>>>>>> b7f9ff6e64d76be956a4580d82e1acdb2653e159
     }
 
     /**
