@@ -4,19 +4,11 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
-
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.units.Voltage;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -32,54 +24,9 @@ import edu.wpi.first.units.Voltage;
  */
 
 public final class Constants {
-  // Constants for the operator
+  /** Constants for the operator. */
   public static class OperatorConstants {
     public static final int DRIVE_CONTROLLER_PORT = 0;
-  }
-
-  // Constants for the field layout
-  public static class FieldConstants {
-    // 0,0 is at the center
-    // -90,156 is at the top left
-    // 90,156 is at the top right
-    // -90, -156 is at the bottom left
-    // 90, -156 is at the bottom right
-    // positive Y is up the field
-    // positive X is to the right
-
-    public static final Translation2d BANK_POSITION = new Translation2d(Inches.of(132), Inches.of(90));
-
-    public static final Translation2d BALL_ONE_POSITION = new Translation2d(Inches.of(126), Inches.of(-10));
-    public static final Translation2d BALL_TWO_POSITION = new Translation2d(Inches.of(90), Inches.of(-10));
-    public static final Translation2d BALL_THREE_POSITION = new Translation2d(Inches.of(54), Inches.of(-10));
-
-    public static final Pose2d AUTO_SCORE_POS_1 = new Pose2d(Inches.of(126), Inches.of(-10),
-        new Rotation2d(Degrees.of(90)));
-    public static final Pose2d AUTO_SCORE_POS_2 = new Pose2d(Inches.of(90), Inches.of(-10),
-        new Rotation2d(Degrees.of(-90)));
-
-    public static final Translation3d TARGET = new Translation3d(Inches.of(0), Inches.of(0), Inches.of(0));
-
-    // dimensions of field
-
-    public static final Measure<Distance> BANK_LENGTH = Inches.of(36);
-    public static final Measure<Distance> BANK_WIDTH = Inches.of(48);
-
-    public static final Measure<Distance> FIELD_LENGTH = Inches.of(312);
-    public static final Measure<Distance> FIELD_WIDTH = Inches.of(180);
-
-    public static final Measure<Distance> HUMAN_PLAYER_ZONE_LENGTH = Inches.of(24);
-    public static final Measure<Distance> HUMAN_PLAYER_ZONE_WIDTH = Inches.of(36);
-
-    public static final Measure<Distance> CELL_BANK_ZONE_LENGTH = Inches.of(87);
-    public static final Measure<Distance> CELL_BANK_ZONE_WIDTH = Inches.of(180);
-
-    public static final Measure<Distance> MID_ZONE_LENGTH = Inches.of(68);
-    public static final Measure<Distance> MID_ZONE_WIDTH = Inches.of(180);
-
-    public static final Measure<Distance> END_ZONE_LENGTH = Inches.of(155);
-    public static final Measure<Distance> END_ZONE_WIDTH = Inches.of(180);
-
   }
 
   // Gravitational constant
