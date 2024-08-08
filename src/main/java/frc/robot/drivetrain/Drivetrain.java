@@ -18,6 +18,7 @@ import static frc.robot.drivetrain.DrivetrainConstants.MINIMUM_VOLTAGE;
 import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
 import static frc.robot.drivetrain.DrivetrainConstants.VOLTS_TO_VELOCTIY;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 
@@ -45,8 +46,8 @@ public class Drivetrain extends SubsystemBase {
     // private final DifferentialDrive diffDrive = new DifferentialDrive(leftLeader, rightLeader);
 
     // Instantiates encoders
-    private final Encoder leftEncoder = new Encoder(leftEncoderSourceA, leftEncoderSourceB);
-    private final Encoder rightEncoder = new Encoder(rightEncoderSourceA, rightEncoderSourceB);
+    private final AbsoluteEncoder leftEncoder = leftLeader.getAbsoluteEncoder();
+    private final AbsoluteEncoder rightEncoder = rightLeader.getAbsoluteEncoder();
 
     // Instantiates controller
     private final PIDController pidController = new PIDController(PID.P, PID.I, PID.D);
@@ -58,8 +59,8 @@ public class Drivetrain extends SubsystemBase {
  * @param setpoint
  * @return
  */
-    private final Measure<Voltage> calculateVoltage(Encoder encoder, double setpoint) {
-        double pidOutput = pidController.calculate(encoder.getDistance(), setpoint);
+    private final Measure<Voltage> calculateVoltage(double measurement, double setpoint) {
+        double pidOutput = pidController.calculate(measurement, setpoint);
         double ffdOutput = feedforward.calculate(pidOutput);
         Measure<Voltage> voltage = Volts.of((pidOutput * VOLTS_TO_VELOCTIY.in(VoltsPerMeterPerSecond) + ffdOutput) / 2);
         if (voltage.gt(MAXIMUM_VOLTAGE)) {
@@ -102,8 +103,8 @@ public class Drivetrain extends SubsystemBase {
      */
     public Command drive(double leftSpeed, double rightSpeed) {
         return run(() -> {
-            leftLeader.setVoltage(calculateVoltage(leftEncoder, leftSpeed).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder, rightSpeed).in(Volts));
+            leftLeader.setVoltage(calculateVoltage(leftEncoder.getVelocity(), leftSpeed).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder.getVelocity(), rightSpeed).in(Volts));
         });
     }
 
@@ -121,10 +122,10 @@ public class Drivetrain extends SubsystemBase {
         pidController.setSetpoint(distance.in(Meters));
 
         return run(() -> {
-            leftLeader.setVoltage(calculateVoltage(leftEncoder, distance.in(Meters)).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder, distance.in(Meters)).in(Volts));
+            leftLeader.setVoltage(calculateVoltage(leftEncoder.getPosition(), distance.in(Meters)).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance.in(Meters)).in(Volts));
 
-            Positioning.updateRobotPosition(rightEncoder.getDistance(), false);
+            Positioning.updateRobotPosition(rightEncoder.getPosition(), false);
         }).until(pidController::atSetpoint);
     }
 
@@ -148,10 +149,10 @@ public class Drivetrain extends SubsystemBase {
 
 
         return run(() -> {
-            leftLeader.setVoltage(-calculateVoltage(rightEncoder, distance).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder, distance).in(Volts));
+            leftLeader.setVoltage(calculateVoltage(leftEncoder.getPosition(), distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance).in(Volts));
 
-            Positioning.updateRobotPosition(rightEncoder.getDistance(), true);
+            Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
         })
                 .until(pidController::atSetpoint);
     }
@@ -172,10 +173,10 @@ public class Drivetrain extends SubsystemBase {
 
         return run(() -> {
 
-            leftLeader.setVoltage(-calculateVoltage(rightEncoder, distance).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder, distance).in(Volts));
+            leftLeader.setVoltage(calculateVoltage(leftEncoder.getPosition(), distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance).in(Volts));
 
-            Positioning.updateRobotPosition(rightEncoder.getDistance(), true);
+            Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
         })
                 .until(pidController::atSetpoint);
     }
@@ -190,10 +191,10 @@ public class Drivetrain extends SubsystemBase {
 
         return run(() -> {
 
-            leftLeader.setVoltage(-calculateVoltage(rightEncoder, distance).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder, distance).in(Volts));
+            leftLeader.setVoltage(calculateVoltage(leftEncoder.getPosition(), distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance).in(Volts));
 
-            Positioning.updateRobotPosition(rightEncoder.getDistance(), true);
+            Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
         })
                 .until(pidController::atSetpoint);
     }
@@ -217,10 +218,10 @@ public class Drivetrain extends SubsystemBase {
 
         return run(() -> {
 
-            leftLeader.setVoltage(-calculateVoltage(rightEncoder, distance).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder, distance).in(Volts));
+            leftLeader.setVoltage(-calculateVoltage(rightEncoder.getPosition(), distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance).in(Volts));
 
-            Positioning.updateRobotPosition(rightEncoder.getDistance(), true);
+            Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
         })
                 .until(pidController::atSetpoint);
     }
