@@ -3,7 +3,6 @@ package frc.robot.drivetrain;
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 import static frc.robot.Ports.Drive.leftEncoderSourceA;
@@ -27,7 +26,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -108,7 +106,10 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public Command drive(double leftSpeed, double rightSpeed) {
-        return run(() -> diffDrive.arcadeDrive(leftSpeed, rightSpeed));
+        return run(() -> {
+            leftLeader.setVoltage(pidController.calculate(leftEncoder.getDistance(), leftSpeed));
+            rightLeader.setVoltage(pidController.calculate(rightEncoder.getDistance(), rightSpeed));
+        });
     }
 
     /**
