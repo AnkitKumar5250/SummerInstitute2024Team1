@@ -23,7 +23,8 @@ public class Elevator extends SubsystemBase {
 
     /** Constructor */
     public Elevator() {
-
+        motor.restoreFactoryDefaults();
+        motor.burnFlash();
     }
 
     /** Returns the reading of the beambreak */

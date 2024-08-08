@@ -40,8 +40,10 @@ public class Shooter extends SubsystemBase {
      */
     public Shooter() {
         // inverted motor(testing motor resulted in ball launched opposite direction)
+        motor.restoreFactoryDefaults();
         motor.setInverted(true);
         motor.setIdleMode(IdleMode.kCoast);
+        motor.burnFlash();
 
         // sets the velocity tolerance of the pid controller
         pidController.setTolerance(PID.VELOCITY_TOLERANCE.in(MetersPerSecond));
