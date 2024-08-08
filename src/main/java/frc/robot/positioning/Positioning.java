@@ -2,7 +2,7 @@ package frc.robot.positioning;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
+import static frc.robot.drivetrain.DrivetrainConstants.TRACK_WIDTH;
 import static frc.robot.positioning.PositioningConstants.BANK_POSITION;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -71,7 +71,7 @@ public class Positioning {
         Translation2d translation = new Translation2d();
         Transform2d transform;
         if (isRotating) {
-            rotation = new Rotation2d(encoderValue / (TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360));
+            rotation = new Rotation2d(encoderValue / (TRACK_WIDTH.in(Meters) * Math.PI / 360));
         } else {
             double xComp = robot.getRotation().getCos() * encoderValue;
             double yComp = robot.getRotation().getSin() * encoderValue;

@@ -69,4 +69,14 @@ public class Robot extends CommandRobot {
     // Configures the controller bindings
     commands.configureButtonBindings();
   }
+
+  @Override
+  public void simulationInit() {
+
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    drivetrain.sim.setInputs(kDefaultPeriod, kDefaultPeriod);
+  }
 }

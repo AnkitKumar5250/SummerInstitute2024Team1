@@ -22,14 +22,21 @@ public final class ShooterConstants {
 
     /** Constants for PID */
     public static final class PID {
-        public static final double kP = 0; // proportional
-        public static final double kI = 0; // integral
-        public static final double kD = 0; // derivative
+        public static final double P = 0; // proportional
+        public static final double I = 0; // integral
+        public static final double D = 0; // derivative
 
         // Maximum accepted error in velocity/voltage of the motor
         public static final Measure<Velocity<Distance>> VELOCITY_TOLERANCE = MetersPerSecond.of(0);
         public static final Measure<Voltage> VOLTAGE_TOLERANCE = Volts.of(0);
 
+    }
+
+    /** Constants for FFD */
+    public static final class FFD {
+        public static final double S = 0; // static gain
+        public static final double V = 0; // velocity gain
+        public static final double A = 0; // acceleration gain
     }
 
     // How many volts is equivalent to 1 m/s of output

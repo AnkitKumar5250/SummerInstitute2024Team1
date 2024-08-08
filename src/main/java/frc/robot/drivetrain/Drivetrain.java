@@ -13,28 +13,32 @@ import static frc.robot.Ports.Drive.rightEncoderSourceA;
 import static frc.robot.Ports.Drive.rightEncoderSourceB;
 import static frc.robot.Ports.Drive.rightFollowerID;
 import static frc.robot.Ports.Drive.rightLeaderID;
+import static frc.robot.drivetrain.DrivetrainConstants.GEARING_REDUCTION;
 import static frc.robot.drivetrain.DrivetrainConstants.MAXIMUM_VOLTAGE;
 import static frc.robot.drivetrain.DrivetrainConstants.MINIMUM_VOLTAGE;
-import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
+import static frc.robot.drivetrain.DrivetrainConstants.MOMENT_OF_INHERTIA;
+import static frc.robot.drivetrain.DrivetrainConstants.ROBOT_MASS;
+import static frc.robot.drivetrain.DrivetrainConstants.STANDART_DEVIATION;
+import static frc.robot.drivetrain.DrivetrainConstants.TRACK_WIDTH;
 import static frc.robot.drivetrain.DrivetrainConstants.VOLTS_TO_VELOCTIY;
+import static frc.robot.drivetrain.DrivetrainConstants.WHEEL_RADIUS;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Ports.Drive.*;
-import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
-import static frc.robot.drivetrain.DrivetrainConstants.*;
-
+import frc.robot.drivetrain.DrivetrainConstants.FFD;
 import frc.robot.drivetrain.DrivetrainConstants.PID;
 import frc.robot.positioning.Positioning;
 
@@ -46,16 +50,20 @@ public class Drivetrain extends SubsystemBase {
     private final CANSparkMax rightLeader = new CANSparkMax(rightLeaderID, kBrushless);
     private final CANSparkMax rightFollower = new CANSparkMax(rightFollowerID, kBrushless);
 
-    // Instantiates Differential Drive
-    private final DifferentialDrive diffDrive = new DifferentialDrive(leftLeader, rightLeader);
-
     // Instantiates encoders
     private final Encoder leftEncoder = new Encoder(leftEncoderSourceA, leftEncoderSourceB);
     private final Encoder rightEncoder = new Encoder(rightEncoderSourceA, rightEncoderSourceB);
 
+    private final EncoderSim leftEncoderSim = new EncoderSim(leftEncoder);
+    private final EncoderSim rightEncoderSim = new EncoderSim(rightEncoder);
+
     // Instantiates controller
     private final PIDController pidController = new PIDController(PID.P, PID.I, PID.D);
-    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 0, 0);
+    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(FFD.S, FFD.V, FFD.A);
+
+    // Instantiates Simulation
+    public final DifferentialDrivetrainSim sim = new DifferentialDrivetrainSim(DCMotor.getNEO(2), GEARING_REDUCTION,
+            MOMENT_OF_INHERTIA, ROBOT_MASS, WHEEL_RADIUS.in(Meters), TRACK_WIDTH.in(Meters), STANDART_DEVIATION);
 
     /**
      * Uses PID and FFD output to calculate velocity, and then converts that to
@@ -63,7 +71,7 @@ public class Drivetrain extends SubsystemBase {
      * 
      * @return voltage.
      */
-    private final Measure<Voltage> calculateVoltage() {
+    private Measure<Voltage> calculateVoltage() {
         double pidOutput = pidController.calculate(rightEncoder.getDistance());
         double ffdOutput = feedforward.calculate(pidOutput);
         Measure<Voltage> voltage = Volts.of((pidOutput * VOLTS_TO_VELOCTIY.in(VoltsPerMeterPerSecond) + ffdOutput) / 2);
@@ -74,6 +82,19 @@ public class Drivetrain extends SubsystemBase {
             voltage = MINIMUM_VOLTAGE;
         }
         return voltage;
+    }
+
+    /**
+     * Updates simulation.
+     */
+    public void updateSim() {
+        sim.setInputs(leftLeader.getBusVoltage(), rightLeader.getBusVoltage());
+        sim.update(0.02);
+
+        leftEncoderSim.setDistance(sim.getLeftPositionMeters());
+        leftEncoderSim.setRate(sim.getLeftVelocityMetersPerSecond());
+        rightEncoderSim.setDistance(sim.getRightPositionMeters());
+        rightEncoderSim.setRate(sim.getRightVelocityMetersPerSecond());
     }
 
     /** Constructor. */
@@ -96,6 +117,7 @@ public class Drivetrain extends SubsystemBase {
         leftLeader.burnFlash();
         leftFollower.burnFlash();
     }
+
     /**
      * Drives based on driver input.
      * 
@@ -146,9 +168,9 @@ public class Drivetrain extends SubsystemBase {
 
         double distance;
         if (angle.in(Degrees) < 0) {
-            distance = (360 + angle.in(Degrees)) * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
+            distance = (360 + angle.in(Degrees)) * (TRACK_WIDTH.in(Meters) / 2) * 2 * Math.PI / 360;
         } else {
-            distance = angle.in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
+            distance = angle.in(Degrees) * (TRACK_WIDTH.in(Meters) / 2) * 2 * Math.PI / 360;
         }
 
         pidController.setSetpoint(distance);
@@ -174,7 +196,7 @@ public class Drivetrain extends SubsystemBase {
         rightEncoder.reset();
 
         double distance = angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees())).in(Degrees)
-                * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
+                * (TRACK_WIDTH.in(Meters) / 2) * 2 * Math.PI / 360;
 
         pidController.setSetpoint(distance);
 
@@ -193,7 +215,7 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        double distance = Positioning.calcAngleTowardsBank().in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI
+        double distance = Positioning.calcAngleTowardsBank().in(Degrees) * (TRACK_WIDTH.in(Meters) / 2) * 2 * Math.PI
                 / 360;
         pidController.setSetpoint(distance);
 
@@ -219,7 +241,7 @@ public class Drivetrain extends SubsystemBase {
         leftEncoder.reset();
         rightEncoder.reset();
 
-        double distance = Positioning.calcAngleTowardsPosition(x, y).in(Degrees) * TURNING_RADIUS.in(Meters) * 2
+        double distance = Positioning.calcAngleTowardsPosition(x, y).in(Degrees) * (TRACK_WIDTH.in(Meters) / 2) * 2
                 * Math.PI
                 / 360;
         pidController.setSetpoint(distance);

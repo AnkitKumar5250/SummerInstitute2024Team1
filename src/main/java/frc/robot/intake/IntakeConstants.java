@@ -23,7 +23,7 @@ public class IntakeConstants {
         public static final Measure<Angle> ANGLE_TOLERANCE = Degrees.of(0);
     }
 
-    /** PID constants for roller */
+    /** FFD constants for pivot */
     public static final class PivotFFD {
         public static final double S = 0; // static gain
         public static final double V = 0; // velocity gain

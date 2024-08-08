@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.positioning.Positioning;
 import frc.robot.shooter.ShooterConstants.PID;
+import frc.robot.shooter.ShooterConstants.FFD;
 
 /** The Shooter Subsystem. */
 public class Shooter extends SubsystemBase {
@@ -41,9 +42,9 @@ public class Shooter extends SubsystemBase {
     // Instantiates encoder
     private final RelativeEncoder encoder = motor.getEncoder();
 
-    // Instantiates controller
-    private final PIDController pidController = new PIDController(PID.kP, PID.kI, PID.kD);
-    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 0, 0);
+    // Instantiates controllers
+    private final PIDController pidController = new PIDController(PID.P, PID.I, PID.D);
+    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(FFD.S, FFD.V, FFD.A);
 
     /**
      * Uses PID and FFD output to calculate velocity, and then converts that to
