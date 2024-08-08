@@ -1,41 +1,39 @@
 package frc.robot.drivetrain;
 
-import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
-import static frc.robot.Ports.Drive.leftEncoderSourceA;
-import static frc.robot.Ports.Drive.leftEncoderSourceB;
-import static frc.robot.Ports.Drive.leftFollowerID;
-import static frc.robot.Ports.Drive.leftLeaderID;
-import static frc.robot.Ports.Drive.rightEncoderSourceA;
-import static frc.robot.Ports.Drive.rightEncoderSourceB;
-import static frc.robot.Ports.Drive.rightFollowerID;
-import static frc.robot.Ports.Drive.rightLeaderID;
-import static frc.robot.drivetrain.DrivetrainConstants.MAXIMUM_VOLTAGE;
-import static frc.robot.drivetrain.DrivetrainConstants.MINIMUM_VOLTAGE;
-import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
-import static frc.robot.drivetrain.DrivetrainConstants.VOLTS_TO_VELOCTIY;
-
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
+import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
+import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 import edu.wpi.first.units.Voltage;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static frc.robot.Ports.Drive.leftFollowerID;
+import static frc.robot.Ports.Drive.leftLeaderID;
+import static frc.robot.Ports.Drive.rightFollowerID;
+import static frc.robot.Ports.Drive.rightLeaderID;
+import static frc.robot.drivetrain.DrivetrainConstants.MAXIMUM_VOLTAGE;
+import static frc.robot.drivetrain.DrivetrainConstants.MINIMUM_VOLTAGE;
 import frc.robot.drivetrain.DrivetrainConstants.PID;
+import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
+import static frc.robot.drivetrain.DrivetrainConstants.VOLTS_TO_VELOCTIY;
+import static frc.robot.drivetrain.DrivetrainConstants.WHEEL_RADIUS;
 import frc.robot.positioning.Positioning;
 
-/** The Drivetrain Subsystem. */
+/**
+ * The Drivetrain Subsystem.
+ */
 public class Drivetrain extends SubsystemBase {
+
     // Instantiates motors
     private final CANSparkMax leftLeader = new CANSparkMax(leftLeaderID, kBrushless);
     private final CANSparkMax leftFollower = new CANSparkMax(leftFollowerID, kBrushless);
@@ -44,7 +42,6 @@ public class Drivetrain extends SubsystemBase {
 
     // Instantiates Differential Drive
     // private final DifferentialDrive diffDrive = new DifferentialDrive(leftLeader, rightLeader);
-
     // Instantiates encoders
     private final AbsoluteEncoder leftEncoder = leftLeader.getAbsoluteEncoder();
     private final AbsoluteEncoder rightEncoder = rightLeader.getAbsoluteEncoder();
@@ -53,12 +50,13 @@ public class Drivetrain extends SubsystemBase {
     private final PIDController pidController = new PIDController(PID.P, PID.I, PID.D);
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 0, 0);
 
-/**
- * use when setting voltage of motor
- * @param encoder
- * @param setpoint
- * @return
- */
+    /**
+     * use when setting voltage of motor
+     *
+     * @param encoder
+     * @param setpoint
+     * @return
+     */
     private final Measure<Voltage> calculateVoltage(double measurement, double setpoint) {
         double pidOutput = pidController.calculate(measurement, setpoint);
         double ffdOutput = feedforward.calculate(pidOutput);
@@ -72,7 +70,9 @@ public class Drivetrain extends SubsystemBase {
         return voltage;
     }
 
-    /** Constructor. */
+    /**
+     * Constructor.
+     */
     public Drivetrain() {
         leftLeader.restoreFactoryDefaults();
         rightLeader.restoreFactoryDefaults();
@@ -91,14 +91,15 @@ public class Drivetrain extends SubsystemBase {
         rightFollower.burnFlash();
         leftLeader.burnFlash();
         leftFollower.burnFlash();
+        leftEncoder.setPositionConversionFactor(WHEEL_RADIUS * 2 * Math.PI);
+        rightEncoder.setPositionConversionFactor(WHEEL_RADIUS * 2 * Math.PI);
     }
+
     /**
      * Drives based on driver input.
-     * 
-     * @param leftSpeed
-     *            Y-axis of left joystick.
-     * @param rightSpeed
-     *            X-axis of right joystick.
+     *
+     * @param leftSpeed Y-axis of left joystick.
+     * @param rightSpeed X-axis of right joystick.
      * @return A command.
      */
     public Command drive(double leftSpeed, double rightSpeed) {
@@ -111,16 +112,10 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Drives a certain distance.
      *
-     * @param meters
-     *            : distance to drive.
+     * @param meters : distance to drive.
      * @return A command.
      */
     public Command drive(Measure<Distance> distance) {
-        leftEncoder.reset();
-        rightEncoder.reset();
-
-        pidController.setSetpoint(distance.in(Meters));
-
         return run(() -> {
             leftLeader.setVoltage(calculateVoltage(leftEncoder.getPosition(), distance.in(Meters)).in(Volts));
             rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance.in(Meters)).in(Volts));
@@ -132,21 +127,16 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Rotates a certain angle counterclockwise.
      *
-     * @param angle
-     *            : angle to rotate.
+     * @param angle : angle to rotate.
      * @return A command.
      */
     public Command rotateDegrees(Measure<Angle> angle) {
-        leftEncoder.reset();
-        rightEncoder.reset();
-
         double distance;
         if (angle.in(Degrees) < 0) {
             distance = (360 + angle.in(Degrees)) * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
         } else {
             distance = angle.in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
         }
-
 
         return run(() -> {
             leftLeader.setVoltage(calculateVoltage(leftEncoder.getPosition(), distance).in(Volts));
@@ -160,14 +150,10 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Rotates to a certain absolute angle.
      *
-     * @param angle
-     *            : angle to rotate to.
+     * @param angle : angle to rotate to.
      * @return A command.
      */
     public Command rotateToAngle(Measure<Angle> angle) {
-        leftEncoder.reset();
-        rightEncoder.reset();
-
         double distance = angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees())).in(Degrees)
                 * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
 
@@ -181,11 +167,10 @@ public class Drivetrain extends SubsystemBase {
                 .until(pidController::atSetpoint);
     }
 
-    /** Faces robot towards bank. */
+    /**
+     * Faces robot towards bank.
+     */
     public Command rotateTowardsBank() {
-        leftEncoder.reset();
-        rightEncoder.reset();
-
         double distance = Positioning.calcAngleTowardsBank().in(Degrees) * TURNING_RADIUS.in(Meters) * 2 * Math.PI
                 / 360;
 
@@ -201,16 +186,11 @@ public class Drivetrain extends SubsystemBase {
 
     /**
      * Faces robot towards a certain position.
-     * 
-     * @param x
-     *            : refrence point X.
-     * @param y
-     *            : refrence point Y.
+     *
+     * @param x : refrence point X.
+     * @param y : refrence point Y.
      */
     public Command rotateTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
-        leftEncoder.reset();
-        rightEncoder.reset();
-
         double distance = Positioning.calcAngleTowardsPosition(x, y).in(Degrees) * TURNING_RADIUS.in(Meters) * 2
                 * Math.PI
                 / 360;
