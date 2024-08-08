@@ -178,8 +178,6 @@ public class Drivetrain extends SubsystemBase {
         pidController.setSetpoint(distance);
 
         return run(() -> {
-            double distance = angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees())).in(Degrees)
-                    * TURNING_RADIUS.in(Meters) * Math.PI / 180;
 
             leftLeader.setVoltage(-calculateVoltage().in(Volts));
             rightLeader.setVoltage(calculateVoltage().in(Volts));
