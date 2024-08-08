@@ -10,10 +10,12 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
+
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,7 +30,6 @@ import static frc.robot.drivetrain.DrivetrainConstants.MOMENT_OF_INHERTIA;
 import static frc.robot.drivetrain.DrivetrainConstants.ROBOT_MASS;
 import static frc.robot.drivetrain.DrivetrainConstants.STANDART_DEVIATION;
 import static frc.robot.drivetrain.DrivetrainConstants.TRACK_WIDTH;
-import static frc.robot.drivetrain.DrivetrainConstants.VOLTS_TO_VELOCTIY;
 import static frc.robot.drivetrain.DrivetrainConstants.WHEEL_RADIUS;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -60,7 +61,7 @@ public class Drivetrain extends SubsystemBase {
     private final EncoderSim rightEncoderSim = new EncoderSim(new Encoder(24, 27));
 
     // Instantiates controller
-    private final PIDController pidController = new PIDController(PID.P, PID.I, PID.D);
+    private final PIDController pidControllerDistance = new PIDController(PID.P, PID.I, PID.D);
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(FFD.S, FFD.V, FFD.A);
 
     // Instantiates Simulation
@@ -68,16 +69,44 @@ public class Drivetrain extends SubsystemBase {
             MOMENT_OF_INHERTIA, ROBOT_MASS, WHEEL_RADIUS.in(Meters), TRACK_WIDTH.in(Meters), STANDART_DEVIATION);
 
     /**
-     * use when setting voltage of motor
-     *
-     * @param encoder
-     * @param setpoint
-     * @return
+     * Returns encoder position
+     * 
+     * @return encoder position
      */
-    private final Measure<Voltage> calculateVoltage(double measurement, double setpoint) {
-        double pidOutput = pidController.calculate(measurement, setpoint);
-        double ffdOutput = feedforward.calculate(pidOutput);
-        Measure<Voltage> voltage = Volts.of((pidOutput * VOLTS_TO_VELOCTIY.in(VoltsPerMeterPerSecond) + ffdOutput) / 2);
+    private final Measure<Distance> getEncoderPosition() {
+        return Meters.of(leftEncoder.getPosition() + rightEncoder.getPosition() / 2);
+    }
+
+    /**
+     * Use when setting voltage of motor based on a distance setpoint.
+     *
+     * @param distanceSetPoint
+     *            : The setpoint in terms of distance.
+     * @return A voltage.
+     */
+    private final Measure<Voltage> calculateVoltageFromDistance(Measure<Distance> distanceSetPoint) {
+        distanceSetPoint.plus(getEncoderPosition());
+        double pidOutput = pidControllerDistance.calculate(getEncoderPosition().in(Meters),
+                distanceSetPoint.in(Meters));
+        Measure<Voltage> voltage = Volts.of(feedforward.calculate(pidOutput));
+        if (voltage.gt(MAXIMUM_VOLTAGE)) {
+            voltage = MAXIMUM_VOLTAGE;
+        }
+        if (voltage.lt(MINIMUM_VOLTAGE)) {
+            voltage = MINIMUM_VOLTAGE;
+        }
+        return voltage;
+    }
+
+    /**
+     * Use when setting voltage of motor based on a velocity setpoint.
+     *
+     * @param setpoint
+     *            : The setpoint in terms of velocity.
+     * @return A voltage.
+     */
+    private final Measure<Voltage> calculateVoltageFromVelocity(Measure<Velocity<Distance>> velocitySetPoint) {
+        Measure<Voltage> voltage = Volts.of(feedforward.calculate(velocitySetPoint.in(MetersPerSecond)));
         if (voltage.gt(MAXIMUM_VOLTAGE)) {
             voltage = MAXIMUM_VOLTAGE;
         }
@@ -137,8 +166,12 @@ public class Drivetrain extends SubsystemBase {
      */
     public Command drive(double leftSpeed, double rightSpeed) {
         return run(() -> {
-            leftLeader.setVoltage(calculateVoltage(leftEncoder.getVelocity(), leftSpeed).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder.getVelocity(), rightSpeed).in(Volts));
+            leftLeader.setVoltage(
+                    calculateVoltageFromVelocity(MetersPerSecond.of(Math.copySign(Math.pow(leftSpeed, 2), leftSpeed)))
+                            .in(Volts));
+            rightLeader.setVoltage(
+                    calculateVoltageFromVelocity(MetersPerSecond.of(Math.copySign(Math.pow(rightSpeed, 2), rightSpeed)))
+                            .in(Volts));
         });
     }
 
@@ -151,11 +184,11 @@ public class Drivetrain extends SubsystemBase {
      */
     public Command drive(Measure<Distance> distance) {
         return run(() -> {
-            leftLeader.setVoltage(calculateVoltage(leftEncoder.getPosition(), distance.in(Meters)).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance.in(Meters)).in(Volts));
+            leftLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
 
             Positioning.updateRobotPosition(rightEncoder.getPosition(), false);
-        }).until(pidController::atSetpoint);
+        }).until(pidControllerDistance::atSetpoint);
     }
 
     /**
@@ -166,20 +199,21 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public Command rotateDegrees(Measure<Angle> angle) {
-        double distance;
+        Measure<Distance> distance;
+
         if (angle.in(Degrees) < 0) {
-            distance = (360 + angle.in(Degrees)) * (TRACK_WIDTH.in(Meters) / 2) * 2 * Math.PI / 360;
+            distance = Meters.of((360 + angle.in(Degrees)) * (TRACK_WIDTH.in(Meters) / 2) * 2 * Math.PI / 360);
         } else {
-            distance = angle.in(Degrees) * (TRACK_WIDTH.in(Meters) / 2) * 2 * Math.PI / 360;
+            distance = Meters.of(angle.in(Degrees) * (TRACK_WIDTH.in(Meters) / 2) * 2 * Math.PI / 360);
         }
 
         return run(() -> {
-            leftLeader.setVoltage(calculateVoltage(leftEncoder.getPosition(), distance).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance).in(Volts));
+            leftLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
 
             Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
         })
-                .until(pidController::atSetpoint);
+                .until(pidControllerDistance::atSetpoint);
     }
 
     /**
@@ -190,34 +224,36 @@ public class Drivetrain extends SubsystemBase {
      * @return A command.
      */
     public Command rotateToAngle(Measure<Angle> angle) {
-        double distance = angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees())).in(Degrees)
-                * TRACK_WIDTH.in(Meters) * Math.PI / 360;
+        Measure<Distance> distance = Meters
+                .of(angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees())).in(Degrees)
+                        * TRACK_WIDTH.in(Meters) * Math.PI / 360);
 
         return run(() -> {
 
-            leftLeader.setVoltage(calculateVoltage(leftEncoder.getPosition(), distance).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance).in(Volts));
+            leftLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
 
             Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
         })
-                .until(pidController::atSetpoint);
+                .until(pidControllerDistance::atSetpoint);
     }
 
     /**
      * Faces robot towards bank.
      */
     public Command rotateTowardsBank() {
-        double distance = Positioning.calcAngleTowardsBank().in(Degrees) * TRACK_WIDTH.in(Meters) * Math.PI
-                / 360;
+        Measure<Distance> distance = Meters
+                .of(Positioning.calcAngleTowardsBank().in(Degrees) * TRACK_WIDTH.in(Meters) * Math.PI
+                        / 360);
 
         return run(() -> {
 
-            leftLeader.setVoltage(calculateVoltage(leftEncoder.getPosition(), distance).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance).in(Volts));
+            leftLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
 
             Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
         })
-                .until(pidController::atSetpoint);
+                .until(pidControllerDistance::atSetpoint);
     }
 
     /**
@@ -229,19 +265,19 @@ public class Drivetrain extends SubsystemBase {
      *            : refrence point Y.
      */
     public Command rotateTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
-        double distance = Positioning.calcAngleTowardsPosition(x, y).in(Degrees) * TRACK_WIDTH.in(Meters)
-                * Math.PI
-                / 360;
-        pidController.setSetpoint(distance);
+        Measure<Distance> distance = Meters
+                .of(Positioning.calcAngleTowardsPosition(x, y).in(Degrees) * TRACK_WIDTH.in(Meters)
+                        * Math.PI
+                        / 360);
 
         return run(() -> {
 
-            leftLeader.setVoltage(-calculateVoltage(rightEncoder.getPosition(), distance).in(Volts));
-            rightLeader.setVoltage(calculateVoltage(rightEncoder.getPosition(), distance).in(Volts));
+            leftLeader.setVoltage(-calculateVoltageFromDistance(distance).in(Volts));
+            rightLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
 
             Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
         })
-                .until(pidController::atSetpoint);
+                .until(pidControllerDistance::atSetpoint);
     }
 
 }
