@@ -21,7 +21,7 @@ import static frc.robot.Ports.Drive.leftFollowerID;
 import static frc.robot.Ports.Drive.leftLeaderID;
 import static frc.robot.Ports.Drive.rightFollowerID;
 import static frc.robot.Ports.Drive.rightLeaderID;
-import static frc.robot.drivetrain.DrivetrainConstants.GEARING_REDUCTION;
+import static frc.robot.drivetrain.DrivetrainConstants.GEARING_RATIO;
 import static frc.robot.drivetrain.DrivetrainConstants.MAXIMUM_VOLTAGE;
 import static frc.robot.drivetrain.DrivetrainConstants.MINIMUM_VOLTAGE;
 import static frc.robot.drivetrain.DrivetrainConstants.MOMENT_OF_INHERTIA;
@@ -56,15 +56,15 @@ public class Drivetrain extends SubsystemBase {
     private final AbsoluteEncoder rightEncoder = rightLeader.getAbsoluteEncoder();
 
     // Instantiates simulated encoders
-    private final EncoderSim leftEncoderSim = new EncoderSim(new Encoder(null, null));
-    private final EncoderSim rightEncoderSim = new EncoderSim(new Encoder(null, null));
+    private final EncoderSim leftEncoderSim = new EncoderSim(new Encoder(15, 12));
+    private final EncoderSim rightEncoderSim = new EncoderSim(new Encoder(24, 27));
 
     // Instantiates controller
     private final PIDController pidController = new PIDController(PID.P, PID.I, PID.D);
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(FFD.S, FFD.V, FFD.A);
 
     // Instantiates Simulation
-    public final DifferentialDrivetrainSim sim = new DifferentialDrivetrainSim(DCMotor.getNEO(2), GEARING_REDUCTION,
+    public final DifferentialDrivetrainSim sim = new DifferentialDrivetrainSim(DCMotor.getNEO(2), GEARING_RATIO,
             MOMENT_OF_INHERTIA, ROBOT_MASS, WHEEL_RADIUS.in(Meters), TRACK_WIDTH.in(Meters), STANDART_DEVIATION);
 
     /**

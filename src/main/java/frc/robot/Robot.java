@@ -11,12 +11,15 @@ import static frc.robot.positioning.PositioningConstants.BALL_ONE_POSITION;
 import static frc.robot.positioning.PositioningConstants.BALL_THREE_POSITION;
 import static frc.robot.positioning.PositioningConstants.BALL_TWO_POSITION;
 
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.CommandRobot;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.elevator.Elevator;
 import frc.robot.intake.Intake;
+import frc.robot.positioning.Positioning;
 import frc.robot.shooter.Shooter;
 
 /**
@@ -34,7 +37,7 @@ public class Robot extends CommandRobot {
   private final Shooter shooter = new Shooter();
   private final Drivetrain drivetrain = new Drivetrain();
 
-  
+  private final Field2d field = new Field2d();
 
   private final CommandXboxController operator = new CommandXboxController(
       Ports.Operator.driverControllerPort);
@@ -45,6 +48,9 @@ public class Robot extends CommandRobot {
   public void robotPeriodic() {
     // Updates the command sceduler
     CommandScheduler.getInstance().run();
+
+    // Updates the robot visualizer
+    field.setRobotPose(Positioning.robot);
   }
 
   @Override
@@ -72,11 +78,13 @@ public class Robot extends CommandRobot {
 
   @Override
   public void simulationInit() {
-
+    // Adds field visualizer to dashboard
+    SmartDashboard.putData("Field",field);
   }
 
   @Override
   public void simulationPeriodic() {
-    drivetrain.sim.setInputs(kDefaultPeriod, kDefaultPeriod);
+    // Updates the simulation
+    drivetrain.updateSim();
   }
 }

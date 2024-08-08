@@ -3,6 +3,8 @@ package frc.robot.drivetrain;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Per;
+
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
@@ -30,7 +32,7 @@ public class DrivetrainConstants {
     }
 
     // Track width
-    public static final Measure<Distance> TRACK_WIDTH = Meters.of(0);
+    public static final Measure<Distance> TRACK_WIDTH = Meters.of(0.7112);
 
     // Distance per rotation
     public static final double ENCODER_CONVERSION_RATE = 0;
@@ -43,16 +45,16 @@ public class DrivetrainConstants {
     public static final Measure<Per<Voltage, Velocity<Distance>>> VOLTS_TO_VELOCTIY = VoltsPerMeterPerSecond.of(0);
 
     // Gearing Reduction
-    public static final double GEARING_REDUCTION = 0;
+    public static final double GEARING_RATIO = 7.29;
 
     // Robot mass
-    public static final double ROBOT_MASS = 0;
+    public static final double ROBOT_MASS = 60;
 
     // Moment of inertia
-    public static final double MOMENT_OF_INHERTIA = 0;
+    public static final double MOMENT_OF_INHERTIA = 7.5;
 
     // Wheel radius
-    public static final Measure<Distance> WHEEL_RADIUS = Meters.of(0);
+    public static final Measure<Distance> WHEEL_RADIUS = Inches.of(3);
 
     // Standart Measurement Deviation
     public static final Vector<N7> STANDART_DEVIATION = VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005);
