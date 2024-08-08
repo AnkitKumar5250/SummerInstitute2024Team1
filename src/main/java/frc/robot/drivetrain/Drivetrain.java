@@ -28,13 +28,8 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Ports.Drive.*;
-import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
-import static frc.robot.drivetrain.DrivetrainConstants.*;
-
 import frc.robot.drivetrain.DrivetrainConstants.PID;
 import frc.robot.positioning.Positioning;
 
