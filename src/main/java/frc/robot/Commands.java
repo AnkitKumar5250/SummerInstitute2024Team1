@@ -43,6 +43,7 @@ public class Commands {
         operator.a().whileTrue(intake());
         operator.b().onTrue(shoot());
         drivetrain.setDefaultCommand(drivetrain.drive(operator.getLeftY(), operator.getRightY()));
+
     }
 
     /**

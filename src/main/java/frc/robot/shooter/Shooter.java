@@ -64,7 +64,7 @@ public class Shooter extends SubsystemBase {
         Measure<Distance> vDistance = Meters.of(TARGET.getZ() - SHOOTER_HEIGHT.in(Meters));
 
         double velocity = Math.sqrt((G.in(MetersPerSecond) * Math.pow(hDistance.in(Meters), 2)));
-
+        
         velocity *= Math.pow(1 / Math.cos(LAUNCH_ANGLE.in(Degrees)), 2);
         velocity /= (2 * (Math.tan(LAUNCH_ANGLE.in(Degrees)) * hDistance.in(Meters) - vDistance.in(Meters)));
 

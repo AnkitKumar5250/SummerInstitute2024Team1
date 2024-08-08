@@ -13,6 +13,7 @@ public class DrivetrainConstants {
         public static final double D = 0;
     }
 
-    // Turning radius of the robot
+    // Turning radius of the robot -> width of track/2
     public static final Measure<Distance> TURNING_RADIUS = Meters.of(0);
+    public static final double ENCODER_CONVERSION_RATE = 0;
 }

@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Ports.Drive.*;
 import static frc.robot.drivetrain.DrivetrainConstants.TURNING_RADIUS;
 import static frc.robot.drivetrain.DrivetrainConstants.*;
+
+import frc.robot.drivetrain.DrivetrainConstants.PID;
 import frc.robot.positioning.Positioning;
 
 /**
@@ -56,7 +58,6 @@ public class Drivetrain extends SubsystemBase {
         leftLeader.burnFlash();
         leftFollower.burnFlash();
     }
-
     /**
      * Drives based on driver input.
      * 
@@ -167,7 +168,7 @@ public class Drivetrain extends SubsystemBase {
 
         return run(() -> {
             double distance = angle.minus(Degrees.of(Positioning.robot.getRotation().getDegrees())).in(Degrees)
-                    * TURNING_RADIUS.in(Meters) * 2 * Math.PI / 360;
+                    * TURNING_RADIUS.in(Meters) * Math.PI / 180;
 
             double encoderValue = Math.abs(rightEncoder.getDistance());
             double voltage = pidController.calculate(encoderValue, distance);
