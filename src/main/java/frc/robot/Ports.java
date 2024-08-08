@@ -27,7 +27,7 @@ public final class Ports {
         public static final int rightFollowerID = 0;
     }
 
-    public static class OperatorConstants {
+    public static class Operator {
         public static final int driverControllerPort = 0;
         public static final int operatorControllerPort = 0;
     }
