@@ -43,9 +43,8 @@ public class Commands {
      *            : Xbox controller.
      */
     public void configureButtonBindings() {
-        operator.leftTrigger().whileTrue(intake());
-        operator.rightTrigger().onTrue(shoot());
-
+        operator.rightBumper().whileTrue(intake());
+        operator.leftBumper().onTrue(shoot());
         drivetrain.setDefaultCommand(drivetrain.drive(operator.getLeftY(), operator.getRightY()));
     }
 

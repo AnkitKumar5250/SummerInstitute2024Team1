@@ -5,8 +5,8 @@ import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.Constants.G;
-import static frc.robot.Constants.FieldConstants.TARGET;
 import static frc.robot.Ports.Shooter.motorPort;
+import static frc.robot.positioning.PositioningConstants.TARGET;
 import static frc.robot.shooter.ShooterConstants.LAUNCH_ANGLE;
 import static frc.robot.shooter.ShooterConstants.POWER_COEFFICIENT;
 import static frc.robot.shooter.ShooterConstants.SHOOTER_HEIGHT;
@@ -14,6 +14,7 @@ import static frc.robot.shooter.ShooterConstants.SHOOTER_HEIGHT;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Distance;
@@ -40,6 +41,7 @@ public class Shooter extends SubsystemBase {
     public Shooter() {
         // inverted motor(testing motor resulted in ball launched opposite direction)
         motor.setInverted(true);
+        motor.setIdleMode(IdleMode.kCoast);
 
         // sets the velocity tolerance of the pid controller
         pidController.setTolerance(PID.VELOCITY_TOLERANCE.in(MetersPerSecond));
