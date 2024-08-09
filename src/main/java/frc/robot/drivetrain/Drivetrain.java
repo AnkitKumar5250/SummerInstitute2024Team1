@@ -1,24 +1,10 @@
 package frc.robot.drivetrain;
 
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkBase.IdleMode;
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
-import com.revrobotics.CANSparkMax;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
-
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.units.Voltage;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Ports.Drive.leftFollowerID;
 import static frc.robot.Ports.Drive.leftLeaderID;
 import static frc.robot.Ports.Drive.rightFollowerID;
@@ -32,11 +18,23 @@ import static frc.robot.drivetrain.DrivetrainConstants.STANDART_DEVIATION;
 import static frc.robot.drivetrain.DrivetrainConstants.TRACK_WIDTH;
 import static frc.robot.drivetrain.DrivetrainConstants.WHEEL_RADIUS;
 
-import edu.wpi.first.math.system.plant.DCMotor;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.drivetrain.DrivetrainConstants.FFD;
 import frc.robot.drivetrain.DrivetrainConstants.PID;
 import frc.robot.positioning.Positioning;
@@ -56,9 +54,9 @@ public class Drivetrain extends SubsystemBase {
     private final AbsoluteEncoder leftEncoder = leftLeader.getAbsoluteEncoder();
     private final AbsoluteEncoder rightEncoder = rightLeader.getAbsoluteEncoder();
 
-    // Instantiates simulated encoders
-    private final EncoderSim leftEncoderSim = new EncoderSim(new Encoder(15, 12));
-    private final EncoderSim rightEncoderSim = new EncoderSim(new Encoder(24, 27));
+    // Used for recording previous drivetrain position
+    public static final DifferentialDriveWheelPositions previousEncoderValues = new DifferentialDriveWheelPositions(0,
+            0);
 
     // Instantiates controller
     private final PIDController pidControllerDistance = new PIDController(PID.P, PID.I, PID.D);
@@ -75,6 +73,19 @@ public class Drivetrain extends SubsystemBase {
      */
     private final Measure<Distance> getEncoderPosition() {
         return Meters.of(leftEncoder.getPosition() + rightEncoder.getPosition() / 2);
+    }
+
+    /**
+     * Returns encoder displacement
+     * 
+     * @return encoder displacement
+     */
+    private final Measure<Distance> getEncoderDisplacement() {
+        Measure<Distance> displacement = Meters.of((leftEncoder.getPosition() - previousEncoderValues.leftMeters)
+                + (rightEncoder.getPosition() - previousEncoderValues.rightMeters) / 2);
+        previousEncoderValues.leftMeters = leftEncoder.getPosition();
+        previousEncoderValues.rightMeters = rightEncoder.getPosition();
+        return displacement;
     }
 
     /**
@@ -117,19 +128,6 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Updates simulation.
-     */
-    public void updateSim() {
-        sim.setInputs(leftLeader.getBusVoltage(), rightLeader.getBusVoltage());
-        sim.update(0.02);
-
-        leftEncoderSim.setDistance(sim.getLeftPositionMeters());
-        leftEncoderSim.setRate(sim.getLeftVelocityMetersPerSecond());
-        rightEncoderSim.setDistance(sim.getRightPositionMeters());
-        rightEncoderSim.setRate(sim.getRightVelocityMetersPerSecond());
-    }
-
-    /**
      * Constructor.
      */
     public Drivetrain() {
@@ -153,6 +151,9 @@ public class Drivetrain extends SubsystemBase {
 
         leftEncoder.setPositionConversionFactor(WHEEL_RADIUS.in(Meters) * 2 * Math.PI);
         rightEncoder.setPositionConversionFactor(WHEEL_RADIUS.in(Meters) * 2 * Math.PI);
+
+        leftEncoder.setVelocityConversionFactor(WHEEL_RADIUS.in(Meters) * 2 * Math.PI);
+        rightEncoder.setVelocityConversionFactor(WHEEL_RADIUS.in(Meters) * 2 * Math.PI);
     }
 
     /**
@@ -187,7 +188,7 @@ public class Drivetrain extends SubsystemBase {
             leftLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
             rightLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
 
-            Positioning.updateRobotPosition(rightEncoder.getPosition(), false);
+            Positioning.updateRobotPosition(getEncoderDisplacement(), false);
         }).until(pidControllerDistance::atSetpoint);
     }
 
@@ -211,7 +212,7 @@ public class Drivetrain extends SubsystemBase {
             leftLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
             rightLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
 
-            Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
+            Positioning.updateRobotPosition(getEncoderDisplacement(), true);
         })
                 .until(pidControllerDistance::atSetpoint);
     }
@@ -233,7 +234,7 @@ public class Drivetrain extends SubsystemBase {
             leftLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
             rightLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
 
-            Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
+            Positioning.updateRobotPosition(getEncoderDisplacement(), true);
         })
                 .until(pidControllerDistance::atSetpoint);
     }
@@ -251,7 +252,7 @@ public class Drivetrain extends SubsystemBase {
             leftLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
             rightLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
 
-            Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
+            Positioning.updateRobotPosition(getEncoderDisplacement(), true);
         })
                 .until(pidControllerDistance::atSetpoint);
     }
@@ -264,9 +265,9 @@ public class Drivetrain extends SubsystemBase {
      * @param y
      *            : refrence point Y.
      */
-    public Command rotateTowardsPosition(Measure<Distance> x, Measure<Distance> y) {
+    public Command rotateTowardsPosition(Translation2d position) {
         Measure<Distance> distance = Meters
-                .of(Positioning.calcAngleTowardsPosition(x, y).in(Degrees) * TRACK_WIDTH.in(Meters)
+                .of(Positioning.calcAngleTowardsPosition(position).in(Degrees) * TRACK_WIDTH.in(Meters)
                         * Math.PI
                         / 360);
 
@@ -275,7 +276,7 @@ public class Drivetrain extends SubsystemBase {
             leftLeader.setVoltage(-calculateVoltageFromDistance(distance).in(Volts));
             rightLeader.setVoltage(calculateVoltageFromDistance(distance).in(Volts));
 
-            Positioning.updateRobotPosition(rightEncoder.getPosition(), true);
+            Positioning.updateRobotPosition(getEncoderDisplacement(), true);
         })
                 .until(pidControllerDistance::atSetpoint);
     }

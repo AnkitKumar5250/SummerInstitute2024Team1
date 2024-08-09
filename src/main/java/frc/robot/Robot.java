@@ -79,12 +79,11 @@ public class Robot extends CommandRobot {
   @Override
   public void simulationInit() {
     // Adds field visualizer to dashboard
-    SmartDashboard.putData("Field",field);
+    SmartDashboard.putData("Field", field);
   }
 
   @Override
   public void simulationPeriodic() {
-    // Updates the simulation
-    drivetrain.updateSim();
+
   }
 }

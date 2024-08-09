@@ -1,6 +1,7 @@
 package frc.robot.intake;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 
@@ -44,5 +45,8 @@ public class IntakeConstants {
     // Maximum and minimum voltage values of the pivot motor
     public static final Measure<Voltage> MAXIMUM_VOLTAGE = Volts.of(0);
     public static final Measure<Voltage> MINIMUM_VOLTAGE = Volts.of(0);
+
+    // Constants to convert from encoder rotations to meters
+    public static final Measure<Distance> ENCODER_CONVERSION_FACTOR = Meters.of(0);
 
 }

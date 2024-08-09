@@ -17,7 +17,8 @@ import edu.wpi.first.units.Voltage;
 
 /** Constants for the Shooter Subsystem. */
 public final class ShooterConstants {
-    // Multiplies power of the shooter
+    // Multiplies power of the shooter(needs to compensate for the velocity loss
+    // through lack of friction with the ball)
     public static final double POWER_COEFFICIENT = 2;
 
     /** Constants for PID */

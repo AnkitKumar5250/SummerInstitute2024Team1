@@ -66,8 +66,8 @@ public class Commands {
     public Command intake() {
         return intake.extend()
                 .alongWith(intake.startRoller())
-                .alongWith(elevator.start()).finallyDo(() -> intake.stopRoller()).alongWith(elevator.stop())
-                .alongWith(intake.retract());
+                .alongWith(elevator.start()).finallyDo(() -> intake.stopRoller().alongWith(elevator.stop())
+                        .alongWith(intake.retract()));
     }
 
     /**
@@ -105,7 +105,7 @@ public class Commands {
      */
     public Command driveTo(Measure<Distance> x, Measure<Distance> y) {
         Measure<Distance> distance = Meters.of(Math.hypot(x.in(Meters), y.in(Meters)));
-        return drivetrain.rotateTowardsPosition(x, y).andThen(() -> drivetrain.drive(distance));
+        return drivetrain.rotateTowardsPosition(new Translation2d(x, y)).andThen(() -> drivetrain.drive(distance));
     }
 
     /**
@@ -171,7 +171,8 @@ public class Commands {
      * @return A command.
      */
     public Command score(Translation2d ballPosition) {
-        return intake().andThen(driveTo(ballPosition).finallyDo(() -> shoot()).alongWith(runOnce(() -> intake().cancel())));
+        return intake()
+                .andThen(driveTo(ballPosition).finallyDo(() -> shoot()).alongWith(runOnce(() -> intake().cancel())));
     }
 
 }

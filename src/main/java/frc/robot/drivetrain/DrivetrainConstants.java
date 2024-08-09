@@ -1,8 +1,5 @@
 package frc.robot.drivetrain;
 
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
@@ -10,6 +7,8 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N7;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 
 /** Constants for the Drivetrain Subsystem. */
