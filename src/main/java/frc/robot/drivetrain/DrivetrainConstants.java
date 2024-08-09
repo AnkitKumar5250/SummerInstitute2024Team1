@@ -22,9 +22,9 @@ public class DrivetrainConstants {
 
     /** Constants for FFD */
     public static final class FFD {
-        public static final double S = 0; // static gain
-        public static final double V = 0; // velocity gain
-        public static final double A = 0; // acceleration gain
+        public static final double S = 0; // static gain(volts per m)
+        public static final double V = 0; // velocity gain(volts per m/s)
+        public static final double A = 0; // acceleration gain(volts per m/s^2)
     }
 
     // Track width
@@ -50,5 +50,8 @@ public class DrivetrainConstants {
     public static final Measure<Distance> WHEEL_RADIUS = Inches.of(3);
 
     // Standart Measurement Deviation
-    public static final Vector<N7> STANDART_DEVIATION = VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005);
+    public static final Vector<N7> STANDART_DEVIATION_IN_MEASUREMENTS = VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005);
+
+    // Velocity coefficient
+    public static final double VELOCITY_COEFFICIENT = 0;
 }

@@ -43,8 +43,7 @@ public class Positioning {
         // Find the x and y differences and takes the arc tangent of them to find the
         // angle. Then is subtracts the robot's current angle in order to get the
         // relative angle.
-        return Degrees.of(Math.atan(Math.abs(position.getX() - robot.getX() / position.getY() - robot.getY())))
-                .minus(Positioning.getOrientation());
+        return Degrees.of(Math.atan(Math.abs(position.getX() - robot.getX() / position.getY() - robot.getY())));
     }
 
     /**
