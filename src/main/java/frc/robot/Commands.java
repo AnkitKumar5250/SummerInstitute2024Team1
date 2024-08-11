@@ -64,10 +64,8 @@ public class Commands {
      * @return A command.
      */
     public Command intake() {
-        return intake.extend()
-                .alongWith(intake.startRoller())
-                .alongWith(elevator.start()).finallyDo(() -> intake.stopRoller().alongWith(elevator.stop())
-                        .alongWith(intake.retract()));
+        return intake.extend().alongWith(intake.startRoller())
+                .finallyDo(() -> intake.stopRoller().alongWith(intake.retract()));
     }
 
     /**
@@ -77,10 +75,10 @@ public class Commands {
      */
     public Command shoot() {
         return drivetrain
-                .rotateTowardsBank()
+                .rotateTowardsBank().alongWith(elevator.start())
                 .alongWith(shooter.setVelocity()).withTimeout(ShooterConstants.SHOOT_TIME.in(Seconds))
                 .finallyDo(() -> drivetrain.rotateDegrees(Positioning.calcAngleTowardsBank().negate())
-                        .alongWith(shooter.turnOff()));
+                        .alongWith(shooter.turnOff()).alongWith(elevator.stop()));
     }
 
     /**
@@ -104,8 +102,8 @@ public class Commands {
      * @return A command.
      */
     public Command driveTo(Measure<Distance> x, Measure<Distance> y) {
-        Measure<Distance> distance = Meters.of(Math.hypot(x.in(Meters), y.in(Meters)));
-        return drivetrain.rotateTowardsPosition(new Translation2d(x, y)).andThen(() -> drivetrain.drive(distance));
+        return drivetrain.rotateTowardsPosition(new Translation2d(x, y))
+                .andThen(() -> drivetrain.drive(Meters.of(Math.hypot(x.in(Meters), y.in(Meters)))));
     }
 
     /**
@@ -149,7 +147,7 @@ public class Commands {
      * @return A command.
      */
     public Command rotateTo(Rotation2d rotation) {
-        return drivetrain.rotateToAngle(Degrees.of(rotation.getDegrees() % rotation.getRotations()));
+        return drivetrain.rotateToAngle(Degrees.of(rotation.getDegrees() % 360));
     }
 
     /**
@@ -171,8 +169,7 @@ public class Commands {
      * @return A command.
      */
     public Command score(Translation2d ballPosition) {
-        return intake()
-                .andThen(driveTo(ballPosition).finallyDo(() -> shoot()).alongWith(runOnce(() -> intake().cancel())));
+        return intake().andThen(driveTo(ballPosition).finallyDo(() -> shoot()).alongWith(runOnce(() -> intake().cancel())));
     }
 
 }
